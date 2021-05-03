@@ -1,30 +1,51 @@
 /**
+   This file is essentially a copy of the simple plot BUT FOR THE
+   FOLLOWING major. important difference:
+
+   1) Note g1 = svg.append("g") comapred to g = svg.append("g")
+   This variable becomes globally visible, through some magic,
+   and the plots would not work if it was named the same as in
+   simpleplot.js because they keep overriding the same values.
+   Note how, idiotically, the same exact synthax does not
+   result with a problem with appending an SVG element to
+   the div.
+
+   2) Classic JS issue of everything is global, so all functions
+   must be named differently.
+
+   Also note that in onMouseOut we set the class attribute
+   value to .bar1 to have it revert to black (see CSS)
+**/
+
+
+/**
  * Creates a simple plot with a mouse over and mouse out events in a
  * given SVG element.
  * @param  {String} elementid SVG Element ID on which plot is rendered.
  */
-function simplePlot(elementid){
+function simplePlot2(elementid){
+    // <td><svg id="growthplt" width = "500" height = "500"></svg></td>
     var svg = d3.select(elementid).append("svg")
         .attr("height", 500)
         .attr("width", 500);
-		var margin = 200;
+		margin = 200;
 		width = svg.attr("width") - margin;
 		height = svg.attr("height") - margin;
 
 		svg.append("text")
-		   .attr("transform", "translate(100,0)")
-		   .attr("x", 50).attr("y", 50)
-		   .attr("font-size", "20px")
-		   .attr("class", "title")
+        .attr("transform", "translate(100,0)")
+		    .attr("x", 50).attr("y", 50)
+		    .attr("font-size", "20px")
+		    .attr("class", "title")
 		    .text("Population bar chart");
 
 	  x = d3.scaleBand().range([0, width]).padding(0.4);
 		y = d3.scaleLinear().range([height, 0]);
 
-		g = svg.append("g")
-		       .attr("transform", "translate(" + 100 + "," + 100 + ")");
+		g1 = svg.append("g")
+        .attr("transform", "translate(" + 100 + "," + 100 + ")");
 
-		d3.csv("data.csv", function(error, data) {
+		d3.csv("../data/data.csv", function(error, data) {
 		    if (error) {
 		        throw error;
 		    }
@@ -32,7 +53,7 @@ function simplePlot(elementid){
 		    x.domain(data.map(function(d) { return d.year; }));
 		    y.domain([0, d3.max(data, function(d) { return d.population; })]);
 
-		    g.append("g")
+		    g1.append("g")
 		     .attr("transform", "translate(0," + height + ")")
 		     .call(d3.axisBottom(x))
 		     .append("text")
@@ -42,7 +63,7 @@ function simplePlot(elementid){
 		     .attr("font-size", "18px")
 		     .attr("stroke", "blue").text("year");
 
-		    g.append("g")
+		    g1.append("g")
 		        .append("text")
 		        .attr("transform", "rotate(-90)")
 		        .attr("y", 6)
@@ -52,17 +73,17 @@ function simplePlot(elementid){
 		        .attr("stroke", "blue")
 		        .text("population");
 
-		    g.append("g")
+		    g1.append("g")
 		        .attr("transform", "translate(0, 0)")
 		        .call(d3.axisLeft(y));
 
-		    g.selectAll(".bar")
+		    g1.selectAll(".bar1")
 		        .data(data)
 		        .enter()
 		        .append("rect")
-		        .attr("class", "bar")
-		        .on("mouseover", simplePlotOnMouseOver)
-		        .on("mouseout", simplePlotOnMouseOut)
+		        .attr("class", "bar1")
+		        .on("mouseover", simplePlot2OnMouseOver)
+		        .on("mouseout", simplePlot2OnMouseOut)
 		        .attr("x", function(d) { return x(d.year); })
 		        .attr("y", function(d) { return y(d.population); })
 		        .attr("width", x.bandwidth()).transition()
@@ -83,7 +104,7 @@ function simplePlot(elementid){
  * @param  {Object} d Rectangle object selected by the cursor.
  * @param  {Number} i Zero based Index of the selected rectangle.
  */
-function simplePlotOnMouseOver(d, i) {
+function simplePlot2OnMouseOver(d, i) {
     d3.select(this)
         .attr('class', 'highlight');
 
@@ -94,7 +115,7 @@ function simplePlotOnMouseOver(d, i) {
         .attr("y", function(d) { return y(d.population) - 10; })
         .attr("height", function(d) { return height - y(d.population) + 10; });
 
-    g.append("text")
+    g1.append("text")
         .attr('class', 'val')
         .attr('x', function() {
             return x(d.year);
@@ -111,10 +132,10 @@ function simplePlotOnMouseOver(d, i) {
  * @param  {Object} d Rectangle object selected by the cursor.
  * @param  {Number} i Zero based Index of the selected rectangle.
  */
-function simplePlotOnMouseOut(d, i) {
+function simplePlot2OnMouseOut(d, i) {
 
     d3.select(this)
-        .attr('class', 'bar');
+        .attr('class', 'bar1');
 
     d3.select(this)
         .transition()
