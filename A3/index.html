@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC"-//W3C//DTD XHTML 1.0 Strict//EN"
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+
+
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <script src = "https://d3js.org/d3.v4.js"></script>
+        <title> Animated bar chart </title>
+
+        <!--
+                 Include your plot CSS design files here!
+        -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+        <link rel="stylesheet" href="simpleplot.css">
+    </head>
+
+
+
+
+    <body>
+        <div class="container">
+            <!--
+                 This is the title, names and a placeholder for potential brief description of our work.
+            -->
+            <h1 class="text-center">Data Visualization CSE 512 A3</h1>
+            <p class="text-center font-weight-bold">David Wang, Jessica Birky, Conor Sayer, Dino Bektesevic</p>
+            <p class="text-justify">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+
+
+            <!--
+                 This is the placeholder section for our plots.
+                 Each row contains contains one or more titles, an optional explanation of the
+                 visualization and an empty div placeholder where we will add our SVG graph element.
+            -->
+            <div class="row">
+                <div class="col">
+                    <h2>Population Plot 1</h2>
+                    <p class="text-justify">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                    <!-- This is where the plot goes, identified by the div ID  -->
+                    <div id="simpleplt" class="d-flex justify-content-center"></div>
+                </div>
+
+
+
+                <div class="col">
+                    <h2>Completely unrelated Growth Plot</h2>
+                    <p class="text-justify">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                    <div id="growthplt" class="d-flex justify-content-center"></div>
+                </div>
+            </div>
+
+
+
+        <!--
+             Include your plot scripts here!
+             It would be nice if your plots could target a specific, pre-existing
+             SVG element (above). This way we can have control over the layout.
+             It would be nice if they were plotted when a function is called
+             so that we can ensure the DOM Content is fully loaded before we start
+             drawing.
+        -->
+        <script src="simpleplot.js"></script>
+        <script src="simpleplot2.js"></script>
+        <script>
+         document.addEventListener('DOMContentLoaded', function(){
+             simplePlot("#simpleplt");
+             simplePlot2("#growthplt");
+         })
+        </script>
+
+
+
+    </body>
+
+
+
+
+</html>
