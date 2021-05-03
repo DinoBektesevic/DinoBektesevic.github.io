@@ -22,12 +22,9 @@ function simplePlot(elementid){
 		y = d3.scaleLinear().range([height, 0]);
 
 		g = svg.append("g")
-		       .attr("transform", "translate(" + 100 + "," + 100 + ")");
+		    .attr("transform", "translate(" + 100 + "," + 100 + ")");
 
-		d3.csv("../data/data.csv", function(error, data) {
-		    if (error) {
-		        throw error;
-		    }
+		d3.csv("../data/data.csv").then(function(data) {
 
 		    x.domain(data.map(function(d) { return d.year; }));
 		    y.domain([0, d3.max(data, function(d) { return d.population; })]);
@@ -83,7 +80,7 @@ function simplePlot(elementid){
  * @param  {Object} d Rectangle object selected by the cursor.
  * @param  {Number} i Zero based Index of the selected rectangle.
  */
-function simplePlotOnMouseOver(d, i) {
+function simplePlotOnMouseOver(i, d) {
     d3.select(this)
         .attr('class', 'highlight');
 
@@ -111,7 +108,7 @@ function simplePlotOnMouseOver(d, i) {
  * @param  {Object} d Rectangle object selected by the cursor.
  * @param  {Number} i Zero based Index of the selected rectangle.
  */
-function simplePlotOnMouseOut(d, i) {
+function simplePlotOnMouseOut(i, d) {
 
     d3.select(this)
         .attr('class', 'bar');

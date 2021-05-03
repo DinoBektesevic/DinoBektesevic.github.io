@@ -45,11 +45,7 @@ function simplePlot2(elementid){
 		g1 = svg.append("g")
         .attr("transform", "translate(" + 100 + "," + 100 + ")");
 
-		d3.csv("../data/data.csv", function(error, data) {
-		    if (error) {
-		        throw error;
-		    }
-
+		d3.csv("../data/data.csv").then(function(data) {
 		    x.domain(data.map(function(d) { return d.year; }));
 		    y.domain([0, d3.max(data, function(d) { return d.population; })]);
 
@@ -104,7 +100,7 @@ function simplePlot2(elementid){
  * @param  {Object} d Rectangle object selected by the cursor.
  * @param  {Number} i Zero based Index of the selected rectangle.
  */
-function simplePlot2OnMouseOver(d, i) {
+function simplePlot2OnMouseOver(i, d) {
     d3.select(this)
         .attr('class', 'highlight');
 
@@ -132,10 +128,12 @@ function simplePlot2OnMouseOver(d, i) {
  * @param  {Object} d Rectangle object selected by the cursor.
  * @param  {Number} i Zero based Index of the selected rectangle.
  */
-function simplePlot2OnMouseOut(d, i) {
+function simplePlot2OnMouseOut(i, d) {
 
     d3.select(this)
-        .attr('class', 'bar1');
+        .attr('class', '.bar1');
+
+
 
     d3.select(this)
         .transition()
