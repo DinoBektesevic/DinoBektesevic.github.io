@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC"-//W3C//DTD XHTML 1.0 Strict//EN"
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+
+
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <script src = "https://d3js.org/d3.v6.js"></script>
+        <title> Animated bar chart </title>
+
+        <!--
+                 Include your plot CSS design files here!
+        -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+        <link rel="stylesheet" href="css/simpleplot.css">
+    </head>
+
+
+
+
+    <body>
+        <div class="container">
+            <!--
+                 This is the title, names and a placeholder for potential brief description of our work.
+            -->
+            <h1 class="text-center">CS Prototype Page</h1>
+            <p class="text-center font-weight-bold">For screwing around</p
+
+            <!--
+                 This is the placeholder section for our plots.
+                 Each row contains contains one or more titles, an optional explanation of the
+                 visualization and an empty div placeholder where we will add our SVG graph element.
+            -->
+            <div class="row">
+                <div class="col">
+                    <h2>Field Altitude vs Time</h2>
+                    <!-- This is where the plot goes, identified by the div ID  -->
+                    <div id="altplt" class="d-flex justify-content-center"></div>
+                </div>
+            </div>
+
+
+
+        <!--
+             Include your plot scripts here!
+             It would be nice if your plots could target a specific, pre-existing
+             SVG element (above). This way we can have control over the layout.
+             It would be nice if they were plotted when a function is called
+             so that we can ensure the DOM Content is fully loaded before we start
+             drawing.
+        -->
+        <script src="js/altplt.js"></script>
+        <script>
+         document.addEventListener('DOMContentLoaded', function(){
+             altplt("#altplt");
+         })
+        </script>
+
+    </body>
+
+
+
+
+</html>
