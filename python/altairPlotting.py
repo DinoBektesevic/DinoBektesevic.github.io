@@ -98,3 +98,12 @@ def make_sky_plot(field_data, moon_data):
     return sky_map.project(
         type='azimuthalEquidistant', scale=250, translate=[500, 400], clipAngle=90, rotate=[0,-90, 180]
     ).configure_view(stroke=None)
+
+if __name__ == "__main__":
+    df = pd.read_csv('../data/mjd-59418-sdss-simple.csv', index_col=0)
+
+    data = clean_data(df)
+    moon_pos = get_moon_data(data)
+    
+    chart = make_sky_plot(data, moon_pos)
+    chart.save('altair.html')
