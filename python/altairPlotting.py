@@ -37,8 +37,14 @@ def make_sky_plot(field_data, moon_data):
     '''
     Use altair to make an interactive plot showing the locations of fields ove the course of the night
     '''
-    label_df = pd.DataFrame({"lat": [0, 0, 0, 0], "long": [0, 90, 180, 270], "text": ["N", "E", "S", "W"]})
-    labels = alt.Chart(label_df).mark_text().encode(
+    directions = pd.DataFrame({"lat": [-5, -5, -5, -5], "long": [0, 90, 180, 270], "text": ["N", "E", "S", "W"]})
+    dir_labels = alt.Chart(directions).mark_text(fontSize=16).encode(
+            longitude="long",
+            latitude="lat",
+            text="text")
+
+    alt_df = pd.DataFrame({"lat": [0, 30, 60, 90, 60, 30, 0], "long": [0, 0, 0, 0, 180, 180, 180], "text": ["0°", "30°", "60°", "90°", "60°", "30°", "0°"]})
+    alt_labels = alt.Chart(alt_df).mark_text().encode(
             longitude="long",
             latitude="lat",
             text="text")
@@ -86,7 +92,8 @@ def make_sky_plot(field_data, moon_data):
         ),
         fields,
         moon,
-        labels,
+        dir_labels,
+        alt_labels,
         title="Sky with SDSS fields, looking up while facing south"
     ).configure_title(
         fontSize=24
