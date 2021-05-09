@@ -248,7 +248,7 @@ if __name__ == "__main__":
     # Read data and preprocess
     df = pd.read_csv('../data/mjd-59418-sdss-simple-expanded.csv', index_col=0)
     data, star_data = get_data(df)
-    moon_pos = pd.read_csv('moon-positions-mjd-59418.csv')
+    moon_pos = pd.read_csv('../data/moon-positions-mjd-59418.csv')
 
     # Create interactive selection elements and scales
     select_field, select_time, field_scale = get_interactive_elements()
