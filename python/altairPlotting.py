@@ -28,8 +28,9 @@ def get_data(data):
     stars = data.query('objType == "bright star"')
     stars = stars.loc[stars['alt'] > -.5] # could change to use 'Risen'
     
-    fields['fieldStatus'] = ['Observing' if x else 'Available' for x in fields['scheduled']]
+    fields['fieldStatus'] = ['Currently Observing' if x else 'Available' for x in fields['scheduled']]
     fields.loc[fields['alt'] < 40, 'fieldStatus'] = 'Unavailable'
+    fields['Altitude(°)'] = fields['alt']
     
     # Assign observation numbers as time step id
     ts = {mjd: ii for ii, mjd in enumerate(fields['mjdExpStart'].sort_values().unique())}
@@ -37,7 +38,9 @@ def get_data(data):
     stars['time_step_id'] = [ts[mjd] for mjd in stars['mjdExpStart']]
     
     # Round mangitudes to nearest 0.5
-    stars['Magnitude'] = round(stars['magnitude'] * 2, 0) / 2
+    stars = stars.query('magnitude < 4.5')
+    stars['Stellar Magnitude'] = round(stars['magnitude'], 0)
+    stars['Altitude(°)'] = stars['alt']
     
     return fields, stars
 
@@ -57,26 +60,27 @@ def make_alts_plot(field_data, select_field, select_time, field_scale):
     # Plot time against altitude
     base = alt.Chart().mark_point().encode(
         x='Observation Start Time:T',
-        y='alt:Q',
+        y='Altitude(°):Q',
         color=alt.Color('fieldStatus:N', sort='descending', scale=field_scale),
-        opacity=alt.condition(select_field, alt.value(1), alt.value(0.1))
+        opacity=alt.condition(select_field, alt.value(1), alt.value(0.05))
     ).add_selection(
         select_time
-    ).add_selection(
-        select_field
+
     ).transform_filter(
-        'datum.fieldStatus != "Observing"'
+        'datum.fieldStatus != "Currently Observing"'
     )
 
     # Plot time against altitude for the currently field observed so it's always on top
     observing_field_alts = alt.Chart().mark_point(filled=True).encode(
         x='Observation Start Time:T',
-        y='alt:Q',
+        y='Altitude(°):Q',
         color=alt.Color('fieldStatus:N', sort='descending', scale=field_scale),
-        opacity=alt.condition(select_field, alt.value(1), alt.value(0.5)),
-        size=alt.condition(select_field, alt.value(200), alt.value(50))
+        opacity=alt.condition(select_field, alt.value(1), alt.value(0.3)),
+        size=alt.condition(select_field, alt.value(200), alt.value(200))
     ).transform_filter(
-        'datum.fieldStatus == "Observing"'
+        'datum.fieldStatus == "Currently Observing"'
+    ).add_selection(
+        select_field
     )
 
     # layer all altitude plot elements together
@@ -98,7 +102,7 @@ def make_alts_plot(field_data, select_field, select_time, field_scale):
             fieldID = '"Obseving fieldID: " + datum.fieldID'
         ).transform_filter(select_time)
         .transform_filter(
-        'datum.fieldStatus == "Observing"'
+        'datum.fieldStatus == "Currently Observing"'
         ),
 
         data=field_data
@@ -128,18 +132,38 @@ def make_sky_map(field_data, star_data, moon_data, select_field, select_time, fi
             text="text")
 
     # Plot moon position
-    moon = alt.Chart(moon_data).mark_point(filled=True, size=400, color='#A0A0A0').encode(
+    moon_base = alt.Chart().mark_point(filled=True, size=400, color='#A0A0A0', opacity=1).encode(
         latitude='moonAlt',
         longitude='moonAz'
     ).transform_filter(
         select_time
     )
 
+    # Mouseover label
+    moon_selection = alt.selection_single(on='mouseover')
+    moon_text = alt.Chart().mark_text(stroke='white', dy=12).encode(
+        latitude='moonAlt',
+        longitude='moonAz',    
+        text='fieldID',
+        opacity=alt.condition(moon_selection, alt.value(1), alt.value(0))
+    ).transform_filter(
+        select_time
+    ).add_selection(
+        moon_selection
+    )
+
+    moon = alt.layer(
+        moon_base,
+        moon_text,
+        data=moon_data
+    )
+
+
     # Plot bright stars
     stars = alt.Chart(star_data).mark_point(filled=True, color='#FFFFFF').encode(
-        latitude='alt',
+        latitude='Altitude(°)',
         longitude='az',
-        size=alt.Size('Magnitude', sort='descending', scale=alt.Scale(range=(5,50)))
+        size=alt.Size('Stellar Magnitude', sort='descending', scale=alt.Scale(type='pow', range=(2,50)))
     ).add_selection(
         select_time
     ).transform_filter(
@@ -149,7 +173,7 @@ def make_sky_map(field_data, star_data, moon_data, select_field, select_time, fi
 
     # Plot fields
     fields = alt.Chart(field_data).mark_square(opacity=0.75, size=80).encode(
-        latitude='alt',
+        latitude='Altitude(°)',
         longitude='az',
         color=alt.Color('fieldStatus', sort='descending', scale=field_scale),
         tooltip=['moonSep', 'fieldID']
@@ -161,19 +185,19 @@ def make_sky_map(field_data, star_data, moon_data, select_field, select_time, fi
 
     # Plot field currently observed so it's on top/higher opacity
     observing_field_skymap = alt.Chart(field_data).mark_square(opacity=1, size=80).encode(
-        latitude='alt',
+        latitude='Altitude(°)',
         longitude='az',
         color=alt.Color('fieldStatus', sort='descending', scale=field_scale),
         tooltip=['moonSep', 'fieldID']
     ).transform_filter(
         select_time
     ).transform_filter(
-        'datum.fieldStatus == "Observing"'
+        'datum.fieldStatus == "Currently Observing"'
     )
 
     # Add red border to selected fields
     selected_field = alt.Chart(field_data).mark_square(opacity=1, size=90, filled=False, color='red').encode(
-        latitude='alt',
+        latitude='Altitude(°)',
         longitude='az'
     ).transform_filter(
         select_time
@@ -207,6 +231,7 @@ def make_sky_map(field_data, star_data, moon_data, select_field, select_time, fi
         # altitude lables
         alt_labels,
         title="Sky with SDSS fields, looking up while facing south"
+        
     ).properties(
         width=800,
         height=600
@@ -237,7 +262,7 @@ def get_interactive_elements():
 
     # color scheme for field status
     yellow = 'yellow' # '#E3E028' # "#6E7DDB"
-    field_scale = alt.Scale(domain=('Observing', 'Available', 'Unavailable'),
+    field_scale = alt.Scale(domain=('Currently Observing', 'Available', 'Unavailable'),
                           range=[yellow, "blue", '#6E7DDB'])
     return select_field, select_time, field_scale
 
@@ -272,4 +297,4 @@ if __name__ == "__main__":
         ).configure_title(fontSize=24)
 
     # Save as html
-    chart.save("altair_polished.html")
+    chart.save("altair_final.html")
