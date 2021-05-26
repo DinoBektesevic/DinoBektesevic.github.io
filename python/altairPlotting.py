@@ -8,10 +8,13 @@ def airmass(altitude, precise=False):
         return 1 / (np.cos(z) + 0.025 * np.exp(-1 * np.cos(z)))
     return 1 / (np.cos(z))
 
-def get_data(data):
+def get_data(data, moon_data=False):
     '''
     Takes the sdss field data, rounds floats, subsets to only observed fields, and calculates utcs times.
     '''
+    field_cols = ['Altitude(°)', 'az', 'moonSep', 'fieldID', 'objType', 'fieldStatus', 'Observation Start Time', 'time_step_id']
+    star_cols = ['Altitude(°)', 'az', 'time_step_id', 'Stellar Magnitude']
+    moon_cols = ['moonAlt', 'moonAz', 'time_step_id', 'fieldID']
     # round columms
     for col in data.dtypes[data.dtypes == 'float64'].index:
         data[col] = round(data[col], 6)
@@ -41,7 +44,16 @@ def get_data(data):
     stars = stars.query('magnitude < 4.5')
     stars['Stellar Magnitude'] = round(stars['magnitude'], 0)
     stars['Altitude(°)'] = stars['alt']
-
+    
+    # Get moon data
+    if moon_data:
+        moon = fields[['mjdExpStart', 'moonAz', 'moonAlt']].drop_duplicates()
+        moon = moon.loc[moon['moonAlt'] > -.5]
+        moon['time_step_id'] = [ts[mjd] for mjd in moon['mjdExpStart']]
+        moon['fieldID'] = 'moon'
+        
+        return fields[field_cols], stars[star_cols], moon[moon_cols]
+    
     return fields, stars
 
 def get_moon_data(field_data):
@@ -266,38 +278,39 @@ def get_interactive_elements():
 if __name__ == "__main__":
     import warnings
     warnings.simplefilter(action='ignore')
+    for mjd in range(59390, 59421):
+        print(mjd)
+        # Read data and preprocess
+        df = pd.read_csv(f'../data/full_data/mjd-{mjd}-sdss-simple-expanded-priority.csv', index_col=0)
+        data, star_data, moon_pos = get_data(df, moon_data=True)
+        # moon_pos = pd.read_csv('../data/moon-positions-mjd-59418.csv')
 
-    # Read data and preprocess
-    df = pd.read_csv('../data/mjd-59418-sdss-simple-expanded.csv', index_col=0)
-    data, star_data = get_data(df)
-    moon_pos = pd.read_csv('../data/moon-positions-mjd-59418.csv')
+        # Create interactive selection elements and scales
+        select_field, select_time, field_scale = get_interactive_elements()
 
-    # Create interactive selection elements and scales
-    select_field, select_time, field_scale = get_interactive_elements()
+        # Make sky plot
+        sky = make_sky_map(data, star_data, moon_pos, select_field, select_time, field_scale)
 
-    # Make sky plot
-    sky = make_sky_map(data, star_data, moon_pos, select_field, select_time, field_scale)
+        # Make time vs altitude plot
+        altitudes = make_alts_plot(data, select_field, select_time, field_scale)
 
-    # Make time vs altitude plot
-    altitudes = make_alts_plot(data, select_field, select_time, field_scale)
+        # Configure plot
+        chart = (sky & altitudes).configure(background="white"
+        ).configure_legend(
+            labelFontSize=14,
+            titleFontSize=16,
+            symbolSize=150
+        ).configure_axis(
+            labelFontSize=14,
+            titleFontSize=16,
+            labelFontWeight=500
+        ).configure_title(
+            fontSize=24
+        ).configure_view(
+            strokeWidth=0
+        ).configure_axis(
+            grid=False
+        )
 
-    # Configure plot
-    chart = (sky & altitudes).configure(background="white"
-    ).configure_legend(
-        labelFontSize=14,
-        titleFontSize=16,
-        symbolSize=150
-    ).configure_axis(
-        labelFontSize=14,
-        titleFontSize=16,
-        labelFontWeight=500
-    ).configure_title(
-        fontSize=24
-    ).configure_view(
-        strokeWidth=0
-    ).configure_axis(
-        grid=False
-    )
-
-    # Save as html
-    chart.save("altair_final.html")
+        # Save as html
+        chart.save(f"../data/viz_jsons/altair_{mjd}.html")
