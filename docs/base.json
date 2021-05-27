@@ -1,0 +1,663 @@
+{
+  "config": {
+    "view": {
+      "continuousWidth": 400,
+      "continuousHeight": 300,
+      "strokeWidth": 0
+    },
+    "axis": {
+      "grid": false
+    },
+    "background": "white",
+    "legend": {
+      "labelFontSize": 14,
+      "symbolSize": 150,
+      "titleFontSize": 16
+    },
+    "title": {
+      "fontSize": 24
+    }
+  },
+  "vconcat": [
+    {
+      "layer": [
+        {
+          "data": {
+            "sphere": true
+          },
+          "mark": {
+            "type": "geoshape",
+            "color": {
+              "gradient": "radial",
+              "stops": [
+                {
+                  "color": "#07161f",
+                  "offset": 0
+                },
+                {
+                  "color": "#0e2836",
+                  "offset": 1
+                }
+              ]
+            }
+          }
+        },
+        {
+          "data": {
+            "graticule": true
+          },
+          "mark": {
+            "type": "geoshape",
+            "stroke": "#515151",
+            "strokeWidth": 1
+          }
+        },
+        {
+          "data": {
+            "name": "dataStars"
+          },
+          "mark": {
+            "type": "point",
+            "color": "#ffffff",
+            "filled": true
+          },
+          "encoding": {
+            "latitude": {
+              "field": "Altitude(°)",
+              "type": "quantitative"
+            },
+            "longitude": {
+              "field": "az",
+              "type": "quantitative"
+            },
+            "size": {
+              "type": "quantitative",
+              "field": "Stellar Magnitude",
+              "scale": {
+                "range": [
+                  2,
+                  50
+                ],
+                "type": "pow"
+              },
+              "sort": "descending"
+            }
+          },
+          "selection": {
+            "selector016": {
+              "type": "single",
+              "on": "mouseover",
+              "nearest": true,
+              "empty": "none",
+              "fields": [
+                "time_step_id"
+              ],
+              "init": {
+                "time_step_id": 0
+              }
+            }
+          },
+          "transform": [
+            {
+              "filter": {
+                "selection": "selector016"
+              }
+            }
+          ]
+        },
+        {
+          "layer": [
+            {
+              "mark": {
+                "type": "text",
+                "size": 26,
+                "text": "🌗"
+              },
+              "encoding": {
+                "latitude": {
+                  "field": "moonAlt",
+                  "type": "quantitative"
+                },
+                "longitude": {
+                  "field": "moonAz",
+                  "type": "quantitative"
+                }
+              },
+              "transform": [
+                {
+                  "filter": {
+                    "selection": "selector016"
+                  }
+                }
+              ]
+            },
+            {
+              "mark": {
+                "type": "text",
+                "dy": 12,
+                "stroke": "white"
+              },
+              "encoding": {
+                "latitude": {
+                  "field": "moonAlt",
+                  "type": "quantitative"
+                },
+                "longitude": {
+                  "field": "moonAz",
+                  "type": "quantitative"
+                },
+                "opacity": {
+                  "condition": {
+                    "value": 1,
+                    "selection": "selector018"
+                  },
+                  "value": 0
+                },
+                "text": {
+                  "type": "nominal",
+                  "field": "fieldID"
+                }
+              },
+              "selection": {
+                "selector018": {
+                  "type": "single",
+                  "on": "mouseover"
+                }
+              },
+              "transform": [
+                {
+                  "filter": {
+                    "selection": "selector016"
+                  }
+                }
+              ]
+            }
+          ],
+          "data": {
+            "name": "dataMoon"
+          }
+        },
+        {
+          "data": {
+            "name": "dataFields"
+          },
+          "mark": {
+            "type": "square",
+            "opacity": 0.75,
+            "size": 80
+          },
+          "encoding": {
+            "color": {
+              "type": "nominal",
+              "field": "fieldStatus",
+              "scale": {
+                "domain": [
+                  "Currently Observing",
+                  "Available",
+                  "Unavailable"
+                ],
+                "range": [
+                  "#ffda60",
+                  "#a7b7bf",
+                  "#506e7f"
+                ]
+              },
+              "sort": "descending"
+            },
+            "latitude": {
+              "field": "Altitude(°)",
+              "type": "quantitative"
+            },
+            "longitude": {
+              "field": "az",
+              "type": "quantitative"
+            },
+            "tooltip": [
+              {
+                "type": "quantitative",
+                "field": "moonSep"
+              },
+              {
+                "type": "nominal",
+                "field": "fieldID"
+              }
+            ]
+          },
+          "selection": {
+            "selector017": {
+              "type": "multi",
+              "on": "click",
+              "fields": [
+                "fieldID"
+              ],
+              "empty": "none"
+            }
+          },
+          "transform": [
+            {
+              "filter": {
+                "selection": "selector016"
+              }
+            }
+          ]
+        },
+        {
+          "data": {
+            "name": "dataFields"
+          },
+          "mark": {
+            "type": "square",
+            "opacity": 1,
+            "size": 80
+          },
+          "encoding": {
+            "color": {
+              "type": "nominal",
+              "field": "fieldStatus",
+              "scale": {
+                "domain": [
+                  "Currently Observing",
+                  "Available",
+                  "Unavailable"
+                ],
+                "range": [
+                  "#ffda60",
+                  "#a7b7bf",
+                  "#506e7f"
+                ]
+              },
+              "sort": "descending"
+            },
+            "latitude": {
+              "field": "Altitude(°)",
+              "type": "quantitative"
+            },
+            "longitude": {
+              "field": "az",
+              "type": "quantitative"
+            },
+            "tooltip": [
+              {
+                "type": "quantitative",
+                "field": "moonSep"
+              },
+              {
+                "type": "nominal",
+                "field": "fieldID"
+              }
+            ]
+          },
+          "transform": [
+            {
+              "filter": {
+                "selection": "selector016"
+              }
+            },
+            {
+              "filter": "datum.fieldStatus == \"Currently Observing\""
+            }
+          ]
+        },
+        {
+          "data": {
+            "name": "dataFields"
+          },
+          "mark": {
+            "type": "square",
+            "color": "red",
+            "filled": false,
+            "opacity": 1,
+            "size": 90
+          },
+          "encoding": {
+            "latitude": {
+              "field": "Altitude(°)",
+              "type": "quantitative"
+            },
+            "longitude": {
+              "field": "az",
+              "type": "quantitative"
+            }
+          },
+          "transform": [
+            {
+              "filter": {
+                "selection": "selector016"
+              }
+            },
+            {
+              "filter": {
+                "selection": "selector017"
+              }
+            }
+          ]
+        },
+        {
+          "data": {
+            "name": "data-70085b541ccabc997242a1396e894881"
+          },
+          "mark": {
+            "type": "text",
+            "fontSize": 16
+          },
+          "encoding": {
+            "latitude": {
+              "field": "lat",
+              "type": "quantitative"
+            },
+            "longitude": {
+              "field": "long",
+              "type": "quantitative"
+            },
+            "text": {
+              "type": "nominal",
+              "field": "text"
+            }
+          }
+        },
+        {
+          "data": {
+            "name": "data-e496e7a90d81bd55bb377ba76f74fb35"
+          },
+          "mark": {
+            "type": "text",
+            "color": "white"
+          },
+          "encoding": {
+            "latitude": {
+              "field": "lat",
+              "type": "quantitative"
+            },
+            "longitude": {
+              "field": "long",
+              "type": "quantitative"
+            },
+            "text": {
+              "type": "nominal",
+              "field": "text"
+            }
+          }
+        }
+      ],
+      "height": 800,
+      "projection": {
+        "clipAngle": 90,
+        "rotate": [
+          0,
+          -90,
+          180
+        ],
+        "type": "azimuthalEquidistant"
+      },
+      "title": "Sky with SDSS fields, looking up while facing south",
+      "width": 800
+    },
+    {
+      "layer": [
+        {
+          "mark": "point",
+          "encoding": {
+            "color": {
+              "type": "nominal",
+              "field": "fieldStatus",
+              "legend": {
+                "title": "Field Status"
+              },
+              "scale": {
+                "domain": [
+                  "Currently Observing",
+                  "Available",
+                  "Unavailable"
+                ],
+                "range": [
+                  "#ffda60",
+                  "#a7b7bf",
+                  "#506e7f"
+                ]
+              },
+              "sort": "descending"
+            },
+            "opacity": {
+              "condition": {
+                "value": 1,
+                "selection": "selector017"
+              },
+              "value": 0.21
+            },
+            "x": {
+              "type": "temporal",
+              "field": "Observation Start Time"
+            },
+            "y": {
+              "type": "quantitative",
+              "field": "Altitude(°)"
+            }
+          },
+          "selection": {
+            "selector016": {
+              "type": "single",
+              "on": "mouseover",
+              "nearest": true,
+              "empty": "none",
+              "fields": [
+                "time_step_id"
+              ],
+              "init": {
+                "time_step_id": 0
+              }
+            }
+          },
+          "transform": [
+            {
+              "filter": "datum.fieldStatus != \"Currently Observing\""
+            }
+          ]
+        },
+        {
+          "mark": {
+            "type": "point",
+            "filled": true
+          },
+          "encoding": {
+            "color": {
+              "type": "nominal",
+              "field": "fieldStatus",
+              "scale": {
+                "domain": [
+                  "Currently Observing",
+                  "Available",
+                  "Unavailable"
+                ],
+                "range": [
+                  "#ffda60",
+                  "#a7b7bf",
+                  "#506e7f"
+                ]
+              },
+              "sort": "descending"
+            },
+            "opacity": {
+              "condition": {
+                "value": 1,
+                "selection": "selector017"
+              },
+              "value": 0.55
+            },
+            "size": {
+              "condition": {
+                "value": 200,
+                "selection": "selector017"
+              },
+              "value": 200
+            },
+            "x": {
+              "type": "temporal",
+              "field": "Observation Start Time"
+            },
+            "y": {
+              "type": "quantitative",
+              "field": "Altitude(°)"
+            }
+          },
+          "selection": {
+            "selector017": {
+              "type": "multi",
+              "on": "click",
+              "fields": [
+                "fieldID"
+              ],
+              "empty": "none"
+            }
+          },
+          "transform": [
+            {
+              "filter": "datum.fieldStatus == \"Currently Observing\""
+            }
+          ]
+        },
+        {
+          "mark": "rule",
+          "encoding": {
+            "x": {
+              "type": "temporal",
+              "field": "Observation Start Time"
+            }
+          },
+          "transform": [
+            {
+              "filter": {
+                "selection": "selector016"
+              }
+            }
+          ]
+        },
+        {
+          "mark": {
+            "type": "text",
+            "align": "left",
+            "baseline": "bottom",
+            "dx": -375,
+            "dy": 75,
+            "fontSize": 14,
+            "fontWeight": 300
+          },
+          "encoding": {
+            "text": {
+              "type": "temporal",
+              "field": "Observation Start Time",
+              "format": "%Y-%m-%dT%H:%M:%S"
+            }
+          },
+          "transform": [
+            {
+              "filter": {
+                "selection": "selector016"
+              }
+            }
+          ]
+        },
+        {
+          "mark": {
+            "type": "text",
+            "align": "left",
+            "baseline": "bottom",
+            "dx": -375,
+            "dy": 90,
+            "fontSize": 14,
+            "fontWeight": 500
+          },
+          "encoding": {
+            "text": {
+              "type": "nominal",
+              "field": "fieldID"
+            }
+          },
+          "transform": [
+            {
+              "calculate": "\"Obseving fieldID: \" + datum.fieldID",
+              "as": "fieldID"
+            },
+            {
+              "filter": {
+                "selection": "selector016"
+              }
+            },
+            {
+              "filter": "datum.fieldStatus == \"Currently Observing\""
+            }
+          ]
+        }
+      ],
+      "data": {
+        "name": "dataFields"
+      },
+      "height": 200,
+      "width": 800
+    }
+  ],
+  "$schema": "https://vega.github.io/schema/vega-lite/v4.8.1.json",
+  "datasets": {
+    "dataStars": [],
+    "dataMoon": [],
+    "dataFields": [],
+    "data-70085b541ccabc997242a1396e894881": [
+      {
+        "lat": -3,
+        "long": 0,
+        "text": "N"
+      },
+      {
+        "lat": -3,
+        "long": 90,
+        "text": "E"
+      },
+      {
+        "lat": -3,
+        "long": 180,
+        "text": "S"
+      },
+      {
+        "lat": -3,
+        "long": 270,
+        "text": "W"
+      }
+    ],
+    "data-e496e7a90d81bd55bb377ba76f74fb35": [
+      {
+        "lat": 2,
+        "long": 0,
+        "text": "0°"
+      },
+      {
+        "lat": 30,
+        "long": 0,
+        "text": "30°"
+      },
+      {
+        "lat": 60,
+        "long": 0,
+        "text": "60°"
+      },
+      {
+        "lat": 90,
+        "long": 0,
+        "text": "90°"
+      },
+      {
+        "lat": 60,
+        "long": 180,
+        "text": "60°"
+      },
+      {
+        "lat": 30,
+        "long": 180,
+        "text": "30°"
+      },
+      {
+        "lat": 2,
+        "long": 180,
+        "text": "0°"
+      }
+    ]
+  }
+}

@@ -117,7 +117,12 @@
          }
 
          async function replot(vegaEmbed, file) {
-             let spec = await getData(file)
+             // let stars = await getData("stars.json")
+             // let spec = await getData("test.json")
+             let [stars, moon, fields, spec] = await Promise.all([getData("stars.json"), getData("moon.json"), getData("fields.json"), getData("base.json")]);
+             spec.datasets.dataStars = stars.data;
+             spec.datasets.dataMoon = moon.data;
+             spec.datasets.dataFields = fields.data;
 
              var embedOpt = {"mode": "vega-lite"};
 
