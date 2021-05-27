@@ -8,7 +8,7 @@
         <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
         <title> CSE 512 A3 </title>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-        <link rel="stylesheet" href="main.css">
+        <link rel="stylesheet" href="css/main.css">
         <style>
          .error {
              color: red;
@@ -17,11 +17,9 @@
     </head>
     <body>
         <div class="container">
-            <!--
-                 This is the title, names and a placeholder for potential brief description of our work.
-            -->
-            <h1 class="text-center">Data Visualization CSE 512 A3</h1>
-            <p class="text-center font-weight-bold">David Wang, Jessica Birky, Conor Sayer, Dino Bektesevic</p>
+            <h1 class="text-center font-weight-bold">SDSS-V:  visualizing a telescopes' nightly plan</h1>
+            <p class="text-center font-weight-bold">Data Visualization CSE 512 A3 <br />
+                David Wang, Jessica Birky, Conor Sayers, Dino Bektesevic</p>
 
             <!--
                  This is the meat of the content, our paragraphs, and the plot.
@@ -30,33 +28,79 @@
             -->
 
             <div class="row">
-	              <div class="col">
-                    <h2>Introduction</h2>
-                    <p class="text-justify">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                <div class="col">
+                    <h2>Goals</h2>
+                    <p class="text-justify">Our goal for this project was to develop a tool to visualize an observing plan (or schedule) their observation strategy for each night on the <a href="https://www.sdss.org/">Sloan Digital Sky Survey (SDSS)</a> - a survey designed to observe ~6 million stars, galaxies, and supermassive black holes over the next 5 years. Planning an optimal nightly observing strategy for targets of interest (e.g. stars, galaxies, quasars) depends on a variety of factors, such as telescope position, time of year, as well as nightly varying parameters, such as moon position and object altitude. Ideally an astronomer would want to observe objects which have a large separation from the moon (to reduce brightness contamination) and high altitude (to reduce the airmass, or amount of Earth’s atmosphere that you are looking through). Some of these factors are subject to change (for example due to the weather conditions of that night), which requires adapting on the fly. This makes a visual interface for quickly picking out targets extremely useful.  Using the interface below, explore for yourself how to plan a nightly observing strategy for SDSS!</p>
                 </div>
-	              <div class="col">
-                    <h2>Rationality</h2>
-                    <p class="text-justify">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                <div class="col">
+                    <h2>How to use</h2>
+                    <h4>1. Orienting yourself on the sky</h4>
+                    <p class="text-justify"><span style="font-weight: bold">The top plot visualizes the entire night sky that would be visible on July 23, 2021 at the observing site in New Mexico, based on simulated data.</span> The radial axis (labeled 0, 30, 60, and 90 degrees) represents the angle on the sky from the horizon, where <span style="font-weight: bold">90 degrees would be looking straight up, and 0 degrees would be directly on the horizon</span>. In this case the telescope would be facing South, with the West to the right, and East to the left, as indicated by the N/E/S/W markers at each quadrant of the plot. To give an intuitive frame of reference, <span style="font-weight: bold">a few hundred stars are plotted in grey</span> according to their magnitudes (0 magnitude = brightest, and 4 magnitude = faintest, as indicated by the size chart on the right-hand column). All of these stars are bright enough to be seen by the human eye, so you may be able to recognize some constellation patterns among these background stars.   </p>
+                </div>
+            </div>
+
+
+
+            <div class="row">
+                <div class="col">
+                    <h4>2. Understanding fields</h4>
+                    <p class="text-justify">While the top plot shows the entire sky, <span style="font-weight: bold">we can only choose to point the telescope at a small fraction of the sky at a time</span>. On the sky plot you’ll find a number of dark or light blue squares representing observing “fields”, or regions containing an object (star, galaxy, quasar) that we want to collect data on. <span style="font-weight: bold">The dark blue squares <span style="background-color: #1f77b4">&nbsp;&nbsp;&nbsp;&nbsp;</span> represent the fields which are “available” to observe at a given time</span> in the night, while the <span style="font-weight: bold">light blue squares <span style="background-color:#aec7e8">&nbsp;&nbsp;</span> represent “unavailable” fields. The yellow square <span style="background-color:yellow">&nbsp;&nbsp;&nbsp;&nbsp;</span> represents the field being observed at that time</span>. The availability of different fields changes over time based on the altitude: if a field is less than 40 degrees above the horizon, Earth’s atmosphere becomes too thick for the telescope to expose through, and might also become obstructed by stuff like trees on the horizon.</p>
+                    <h4>3. Interaction </h4>
+                    <p class="text-justify">Because the altitude of a field dictates its observability, the lower panel visualizes the altitude of each of the fields as a function of time time of night, which spans 8:30pm to 5:30am in 18 min increments. <span style="font-weight: bold">Hovering over the time axis in the bottom panel with your mouse will allow you to scroll through different times and update the sky plot above.</span></p>
+                </div>
+                <div class="col">
+                    <p>
+                        <select name="night-data", id="night-data">
+                            <option value="data/viz_jsons/altair_59390.json">59390</option>
+                            <option value="data/viz_jsons/altair_59391.json">59391</option>
+                            <option value="data/viz_jsons/altair_59392.json">59392</option>
+                            <option value="data/viz_jsons/altair_59393.json">59393</option>
+                            <option value="data/viz_jsons/altair_59394.json">59394</option>
+                            <option value="data/viz_jsons/altair_59395.json">59395</option>
+                            <option value="data/viz_jsons/altair_59396.json">59396</option>
+                            <option value="data/viz_jsons/altair_59397.json">59397</option>
+                            <option value="data/viz_jsons/altair_59398.json">59398</option>
+                            <option value="data/viz_jsons/altair_59399.json">59399</option>
+                            <option value="data/viz_jsons/altair_59400.json">59400</option>
+                            <option value="data/viz_jsons/altair_59401.json">59401</option>
+                            <option value="data/viz_jsons/altair_59402.json">59402</option>
+                            <option value="data/viz_jsons/altair_59403.json">59403</option>
+                            <option value="data/viz_jsons/altair_59404.json">59404</option>
+                            <option value="data/viz_jsons/altair_59405.json">59405</option>
+                            <option value="data/viz_jsons/altair_59406.json">59406</option>
+                            <option value="data/viz_jsons/altair_59407.json">59407</option>
+                            <option value="data/viz_jsons/altair_59408.json">59408</option>
+                            <option value="data/viz_jsons/altair_59409.json">59409</option>
+                            <option value="data/viz_jsons/altair_59410.json">59410</option>
+                            <option value="data/viz_jsons/altair_59411.json">59411</option>
+                            <option value="data/viz_jsons/altair_59412.json">59412</option>
+                            <option value="data/viz_jsons/altair_59413.json">59413</option>
+                            <option value="data/viz_jsons/altair_59414.json">59414</option>
+                            <option value="data/viz_jsons/altair_59415.json">59415</option>
+                            <option value="data/viz_jsons/altair_59416.json">59416</option>
+                            <option value="data/viz_jsons/altair_59417.json">59417</option>
+                            <option value="data/viz_jsons/altair_59418.json">59418</option>
+                            <option value="data/viz_jsons/altair_59419.json">59419</option>
+                            <option value="data/viz_jsons/altair_59420.json">59420</option>
+                        </select></p>
+                    <!-- This is where the plot goes, identified by the div ID  -->
+                        <div id="vis" class="d-flex justify-content-center"></div>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col">
-                    <h2>How-to</h2>
-                    <p class="text-justify">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-	                  <h2>Another title</h2>
-                    <p class="text-justify">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                    <select name="night-data" id="night-data">
-                        <option value="altair_polished.json">Data1</option>
-                        <option value="altair_polished2.json">Data2</option>
-                    </select>
+                    <p><br></p>
+                    <p class="text-justify"><span style="font-weight: bold">To get more information on a field, you can hover over each of the squares</span>, which will tell you the field identification number, as well as the degree separation from the moon. The moon separation can be an important variable to consider, particularly when observing faint sources, which can be washed out by the moon.</p>
+                    <p>Additionally, <span style="font-weight: bold">you can also click on a field (on either the top sky plot or bottom altitude plot)</span>, and that will <span style="font-weight: bold">outline the field in <span style="color: red">red</span></span> on the sky plot, <span style="font-weight: bold">and bold the corresponding points</span> on the altitude plot.</p>
                 </div>
                 <div class="col">
-                    <!-- This is where the plot goes, identified by the div ID  -->
-                    <div id="vis" class="d-flex justify-content-center"></div>
+                    <h4>4. Simulate an observing strategy </h4>
+                    <p class="text-justify">Finally, putting all of these pieces together, we can simulate an observing strategy and visually inspect whether it looks feasible, or consider alternate strategies. An example observing plan for the night is shown in both panels in yellow. For each time increment, the telescope would choose a different field to observe, and attempt to maximize the number of fields it can visit in a night. <span style="font-weight: bold">This tool would then allow an astronomer to easily see what an observing plan for the night looks like, and dynamically replan things if the observing conditions change during the night.</span></p>
+                    <p>For more details, see our full repository: <a href="https://github.com/cse512-21s/A3-astroviz">https://github.com/cse512-21s/A3-astroviz</a> </p>
+
                 </div>
             </div>
-
         </div>
         <!--
              Include your plot scripts here!
@@ -90,12 +134,11 @@
                  .catch(error => showError(el, error));
          }
 
-         replot(vegaEmbed, "altair_polished.json");
+         replot(vegaEmbed, "data/viz_jsons/altair_59390.json");
 
          document.getElementById('night-data').addEventListener('change', function() {
              replot(vegaEmbed, this.value);
          });
-
         </script>
     </body>
 </html>
