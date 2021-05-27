@@ -112,13 +112,11 @@
         -->
         <script>
          async function getData(file){
-             const data = await $.getJSON(file);
+             const data = $.getJSON(file);
              return data;
          }
 
          async function replot(vegaEmbed, file) {
-             // let stars = await getData("stars.json")
-             // let spec = await getData("test.json")
              let [stars, moon, fields, spec] = await Promise.all([getData("stars.json"), getData("moon.json"), getData("fields.json"), getData("base.json")]);
              spec.datasets.dataStars = stars.data;
              spec.datasets.dataMoon = moon.data;
