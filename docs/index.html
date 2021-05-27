@@ -5,6 +5,7 @@
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega@5"></script>
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-lite@4.8.1"></script>
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-embed@6"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
         <title> CSE 512 A3 </title>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
         <link rel="stylesheet" href="main.css">
@@ -48,6 +49,39 @@
                     <p class="text-justify">Because the altitude of a field dictates its observability, the lower panel visualizes the altitude of each of the fields as a function of time time of night, which spans 8:30pm to 5:30am in 18 min increments. <span style="font-weight: bold">Hovering over the time axis in the bottom panel with your mouse will allow you to scroll through different times and update the sky plot above.</span></p>
                 </div>
                 <div class="col">
+                    <p>                                    <select name="night-data", id="night-data">
+                    <option value="data/viz_jsons/altair_59390.json">59390</option>
+                    <option value="data/viz_jsons/altair_59391.json">59391</option>
+                    <option value="data/viz_jsons/altair_59392.json">59392</option>
+                    <option value="data/viz_jsons/altair_59393.json">59393</option>
+                    <option value="data/viz_jsons/altair_59394.json">59394</option>
+                    <option value="data/viz_jsons/altair_59395.json">59395</option>
+                    <option value="data/viz_jsons/altair_59396.json">59396</option>
+                    <option value="data/viz_jsons/altair_59397.json">59397</option>
+                    <option value="data/viz_jsons/altair_59398.json">59398</option>
+                    <option value="data/viz_jsons/altair_59399.json">59399</option>
+                    <option value="data/viz_jsons/altair_59400.json">59400</option>
+                    <option value="data/viz_jsons/altair_59401.json">59401</option>
+                    <option value="data/viz_jsons/altair_59402.json">59402</option>
+                    <option value="data/viz_jsons/altair_59403.json">59403</option>
+                    <option value="data/viz_jsons/altair_59404.json">59404</option>
+                    <option value="data/viz_jsons/altair_59405.json">59405</option>
+                    <option value="data/viz_jsons/altair_59406.json">59406</option>
+                    <option value="data/viz_jsons/altair_59407.json">59407</option>
+                    <option value="data/viz_jsons/altair_59408.json">59408</option>
+                    <option value="data/viz_jsons/altair_59409.json">59409</option>
+                    <option value="data/viz_jsons/altair_59410.json">59410</option>
+                    <option value="data/viz_jsons/altair_59411.json">59411</option>
+                    <option value="data/viz_jsons/altair_59412.json">59412</option>
+                    <option value="data/viz_jsons/altair_59413.json">59413</option>
+                    <option value="data/viz_jsons/altair_59414.json">59414</option>
+                    <option value="data/viz_jsons/altair_59415.json">59415</option>
+                    <option value="data/viz_jsons/altair_59416.json">59416</option>
+                    <option value="data/viz_jsons/altair_59417.json">59417</option>
+                    <option value="data/viz_jsons/altair_59418.json">59418</option>
+                    <option value="data/viz_jsons/altair_59419.json">59419</option>
+                    <option value="data/viz_jsons/altair_59420.json">59420</option>
+                    </select></p>
                     <!-- This is where the plot goes, identified by the div ID  -->
                     <div id="vis" class="d-flex justify-content-center"></div>
                 </div>
@@ -75,6 +109,35 @@
              so that we can ensure the DOM Content is fully loaded before we start
              drawing.
         -->
-        <script src="vegaEmbed.js"></script>
+        <script>
+         async function getData(file){
+             const data = await $.getJSON(file);
+             return data;
+         }
+
+         async function replot(vegaEmbed, file) {
+             let spec = await getData(file)
+
+             var embedOpt = {"mode": "vega-lite"};
+
+             function showError(el, error){
+                 el.innerHTML = ('<div class="error" style="color:red;">'
+                               + '<p>JavaScript Error: ' + error.message + '</p>'
+                               + "<p>This usually means there's a typo in your chart specification. "
+                               + "See the javascript console for the full traceback.</p>"
+                               + '</div>');
+                 throw error;
+             }
+             const el = document.getElementById('vis');
+             vegaEmbed("#vis", spec, embedOpt)
+                 .catch(error => showError(el, error));
+         }
+
+         replot(vegaEmbed, "data/viz_jsons/altair_59390.json");
+
+         document.getElementById('night-data').addEventListener('change', function() {
+             replot(vegaEmbed, this.value);
+         });
+        </script>
     </body>
 </html>
