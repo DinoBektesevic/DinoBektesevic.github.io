@@ -1,0 +1,23 @@
+/* This is actually override for bootstrap CSS so no touchy this */
+.container {
+    max-width: 1400px;
+}
+
+/* This is actually override for bootstrap CSS so no touchy */
+
+.bar {
+    fill: green;
+}
+
+.bar1{
+    fill: black;
+}
+
+.highlight {
+    fill: red;
+}
+
+.title {
+    fill: blue;
+    font-weight: bold;
+}
