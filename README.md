@@ -8,7 +8,7 @@ Team members:
 * Jessica Birky  
 * David Wang
 
-Project page: https://cse512-21s.github.io/FP-astro-plan/  
+Project page: https://cse512-21s.github.io/FP-astro-plan/
 
 # SDSS-V:  visualizing a telescopes' nightly plan
 
