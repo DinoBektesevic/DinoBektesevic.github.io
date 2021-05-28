@@ -111,22 +111,17 @@
              drawing.
         -->
         <script>
-         function createURL(date, filename){
-             let baseUrl =  "https://www.apo.nmsu.edu/CS/json_data/";
+         function createURI(date, filename){
+             let baseUrl =  "json_data/";
              return baseUrl+date.toString()+"/"+filename.toString();
-
-         }
+         };
 
          async function getData(file){
              const data = $.getJSON(file);
              return data;
-         }
+         };
 
          async function replot(vegaEmbed, file) {
-             fetch('https://www.apo.nmsu.edu/CS/json_data/59305/fields.json')
-                 .then( response => response.json() )
-                 .then( data => console.log(data))
-
              let [stars, moon, fields, spec] = await Promise.all([getData("stars.json"), getData("moon.json"), getData("fields.json"), getData("base.json")]);
              spec.datasets.dataStars = stars.data;
              spec.datasets.dataMoon = moon.data;
@@ -145,7 +140,7 @@
              const el = document.getElementById('vis');
              vegaEmbed("#vis", spec, embedOpt)
                  .catch(error => showError(el, error));
-         }
+         };
 
          replot(vegaEmbed, "data/viz_jsons/altair_59390.json");
 
