@@ -1,15 +1,14 @@
-# cse512
 CSE 512 UW Homeworks
 =======
 
-# A3-astroviz
+# FP-astro-plan
 Team members:  
 * Conor Sayres  
 * Dino Bektesevic  
 * Jessica Birky  
 * David Wang
 
-Project page: https://cse512-21s.github.io/A3-astroviz/  
+Project page: https://cse512-21s.github.io/FP-astro-plan/  
 
 # SDSS-V:  visualizing a telescopes' nightly plan
 
