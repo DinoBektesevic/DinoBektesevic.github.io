@@ -62,6 +62,7 @@ def get_data(data, moon_data=False):
 
     return fields, stars
 
+
 def get_moon_data(field_data):
     '''
     Get moon positions and phases over the course of the night
@@ -69,6 +70,7 @@ def get_moon_data(field_data):
     moon_pos = field_data[['mjdExpStart', 'moonAz', 'moonAlt', 'moonPhase']].drop_duplicates()
     moon_pos = moon_pos.loc[moon_pos['moonAlt'] > -.5]
     return moon_pos
+
 
 def make_alts_plot(field_data, select_field, select_time, field_scale):
     '''
@@ -78,7 +80,8 @@ def make_alts_plot(field_data, select_field, select_time, field_scale):
     base = alt.Chart().mark_point().encode(
         x='Observation Start Time:T',
         y='Altitude(°):Q',
-        color=alt.Color('fieldStatus:N', sort='descending', scale=field_scale, legend=alt.Legend(title="Field Status")),
+        # color=alt.Color('fieldStatus:N', sort='descending', scale=field_scale, legend=alt.Legend(title="Field Status")),
+        color=alt.Color('fieldStatus:N', sort='descending', scale=field_scale), # cs remove legend
         # opacity=alt.condition(select_field, alt.value(1), alt.value(0.21))
         opacity=alt.condition(select_field, alt.value(1), alt.value(0))
     ).add_selection(
@@ -131,14 +134,14 @@ def make_alts_plot(field_data, select_field, select_time, field_scale):
             x='Observation Start Time:T'
         ).transform_filter(select_time),
         # add text to display datetime
-        alt.Chart().mark_text(align='left', dx=-375, dy=75, baseline='bottom', fontSize=14, fontWeight=300).encode(
+        alt.Chart().mark_text(align='left', dx=-375, dy=-150, baseline='bottom', fontSize=25, color="#C0C0C0", fontWeight=300).encode(
             text=alt.Text('Observation Start Time:T', format="%Y-%m-%dT%H:%M:%S")
         ).transform_filter(select_time),
         # add text to display field Scheduled Now
-        alt.Chart().mark_text(align='left', dx=-375, dy=90, baseline='bottom', fontSize=14, fontWeight=500).encode(
+        alt.Chart().mark_text(align='left', dx=175, dy=-150, baseline='bottom', fontSize=25, color="#C0C0C0", fontWeight=500).encode(
             text='fieldID'
         ).transform_calculate(
-            fieldID = '"Observing fieldID: " + datum.fieldID'
+            fieldID = '"Scheduled fieldID: " + datum.fieldID'
         ).transform_filter(select_time)
         .transform_filter(
             'datum.fieldStatus == "Scheduled Now"'
@@ -164,7 +167,7 @@ def make_sky_map(field_data, star_data, moon_data, select_field, select_time, fi
     '''
     # NSEW labels
     directions = pd.DataFrame({"lat": [-3, -3, -3, -3], "long": [0, 90, 180, 270], "text": ["N", "E", "S", "W"]})
-    dir_labels = alt.Chart(directions).mark_text(fontSize=16, color="white").encode(
+    dir_labels = alt.Chart(directions).mark_text(fontSize=16, color="#C0C0C0").encode(
         longitude="long",
         latitude="lat",
         text="text")
@@ -305,7 +308,7 @@ def make_sky_map(field_data, star_data, moon_data, select_field, select_time, fi
         dir_labels,
         # altitude lables
         alt_labels,
-        title="Sky with SDSS fields, looking up while facing south"
+        # title="Sky with SDSS fields, looking up while facing south" # cs remove title
     ).properties(
         width=800,
         height=800,
@@ -356,18 +359,28 @@ if __name__ == "__main__":
 
         # Make time vs altitude plot
         altitudes = make_alts_plot(data, select_field, select_time, field_scale)
+        # for some reason padding doesn't work?
+        # try commenting and uncommenting this line!
+        altitudes = altitudes.properties(width=400, height=300) #, padding={"left":200, "top": 0, "right": 0, "bottom": 0})
+        # import pdb; pdb.set_trace()
 
         # Configure plot
         # chart = (sky & altitudes).configure(background="white"
         chart = (sky & altitudes).configure(background="#0e2836"
-        ).configure_legend(
-            labelFontSize=14,
-            titleFontSize=16,
-            symbolSize=150
         ).configure_axis(
+            labelFontSize=20,
+            titleFontSize=20,
+            labelFontWeight=500,
+        ).configure_axisLeft(
+            labelColor="#C0C0C0",
+            titleColor="#C0C0C0",
+            titleFontSize=20,
             labelFontSize=14,
-            titleFontSize=16,
-            labelFontWeight=500
+        ).configure_axisBottom(
+            labelColor="#C0C0C0",
+            titleColor="#C0C0C0",
+            titleFontSize=20,
+            labelFontSize=14,
         ).configure_title(
             fontSize=24
         ).configure_view(
@@ -375,6 +388,13 @@ if __name__ == "__main__":
         ).configure_axis(
             grid=False
         )
+
+        # removed legend (first call)
+            #.configure_legend(
+            #   labelFontSize=14,
+            #   titleFontSize=16,
+            #   symbolSize=150
+            #)
 
         # Save as html
         # chart.save(f"../data/viz_jsons/altair_{mjd}.html")
