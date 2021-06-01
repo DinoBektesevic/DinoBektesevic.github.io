@@ -12,7 +12,7 @@ def get_data(data, moon_data=False):
     '''
     Takes the sdss field data, rounds floats, subsets to only observed fields, and calculates utcs times.
     '''
-    field_cols = ['Altitude(°)', 'az', 'moonSep', 'fieldID', 'objType', 'fieldStatus', 'Observation Start Time', 'time_step_id']
+    field_cols = ['Altitude(°)', 'az', 'moonSep', 'fieldID', 'objType', 'fieldStatus', 'Observation Start Time', 'time_step_id', 'priority', 'completion', 'Scheduled']
     star_cols = ['Altitude(°)', 'az', 'time_step_id', 'Stellar Magnitude']
     moon_cols = ['moonAlt', 'moonAz', 'time_step_id', 'fieldID']
     # round columms
@@ -23,16 +23,22 @@ def get_data(data, moon_data=False):
     scheduled = data.loc[data['scheduled']==True]
     scheduled.sort_values('mjdExpStart', inplace=True)
 
-    fields = data[data['fieldID'].isin(scheduled['fieldID'])]
-    # fields = data.query('objType == "sdss field"')
+    # fields = data[data['fieldID'].isin(scheduled['fieldID'])]
+    fields = data.query('objType == "sdss field"')
     fields['Observation Start Time'] = pd.to_datetime(fields['mjdExpStart'] + 2400000.5, unit='D', origin='julian') - pd.Timedelta(hours=6)
     fields = fields.loc[fields['alt'] > -.5] # could change to use 'Risen'
 
     stars = data.query('objType == "bright star"')
     stars = stars.loc[stars['alt'] > -.5] # could change to use 'Risen'
 
-    fields['fieldStatus'] = ['Currently Observing' if x else 'Available' for x in fields['scheduled']]
+    # Create different field statuses
+    fields['fieldStatus'] = 'Available'
+    fields.loc[fields['scheduled'], 'fieldStatus'] = 'Scheduled Now'
     fields.loc[fields['alt'] < 40, 'fieldStatus'] = 'Unavailable'
+    
+    fields['Scheduled'] = False
+    fields.loc[fields['fieldID'].isin(scheduled['fieldID']), 'Scheduled'] = True
+    
     fields['Altitude(°)'] = fields['alt']
 
     # Assign observation numbers as time step id
@@ -278,7 +284,7 @@ def get_interactive_elements():
 if __name__ == "__main__":
     import warnings
     warnings.simplefilter(action='ignore')
-    for mjd in range(59390, 59421):
+    for mjd in range(59390, 59391):
         print(mjd)
         # Read data and preprocess
         df = pd.read_csv(f'../data/full_data/mjd-{mjd}-sdss-simple-expanded-priority.csv', index_col=0)
@@ -313,4 +319,5 @@ if __name__ == "__main__":
         )
 
         # Save as html
-        chart.save(f"../data/viz_jsons/altair_{mjd}.html")
+        # chart.save(f"../data/viz_jsons/altair_{mjd}.html")
+        chart.save(f"altair_{mjd}.html")
