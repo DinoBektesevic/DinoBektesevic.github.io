@@ -84,7 +84,8 @@ def make_alts_plot(field_data, select_field, select_time, field_scale):
         select_time
     ).transform_filter(
         'datum.fieldStatus != "Scheduled Now"'
-    )
+    ).transform_filter(
+        'datum.Scheduled')
 
     # Plot time against altitude for the currently field observed so it's always on top
     observing_field_alts = alt.Chart().mark_point(filled=True).encode(
@@ -111,11 +112,11 @@ def make_alts_plot(field_data, select_field, select_time, field_scale):
         alt.Chart().mark_text(align='left', dx=-375, dy=75, baseline='bottom', fontSize=14, fontWeight=300).encode(
             text=alt.Text('Observation Start Time:T', format="%Y-%m-%dT%H:%M:%S")
         ).transform_filter(select_time),
-        # add text to display field currently observing
+        # add text to display field Scheduled Now
         alt.Chart().mark_text(align='left', dx=-375, dy=90, baseline='bottom', fontSize=14, fontWeight=500).encode(
             text='fieldID'
         ).transform_calculate(
-            fieldID = '"Obseving fieldID: " + datum.fieldID'
+            fieldID = '"Observing fieldID: " + datum.fieldID'
         ).transform_filter(select_time)
         .transform_filter(
             'datum.fieldStatus == "Scheduled Now"'
@@ -128,6 +129,7 @@ def make_alts_plot(field_data, select_field, select_time, field_scale):
     )
 
     return alts
+
 
 def make_sky_map(field_data, star_data, moon_data, select_field, select_time, field_scale):
     '''
