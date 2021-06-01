@@ -189,11 +189,12 @@ def make_sky_map(field_data, star_data, moon_data, select_field, select_time, fi
 
 
     # Plot fields
-    fields = alt.Chart(field_data).mark_square(opacity=0.75, size=80).encode(
+    fields = alt.Chart(field_data).mark_square(opacity=0.75, size=100, stroke='red', strokeWidth=2).encode(
         latitude='Altitude(°)',
         longitude='az',
         color=alt.Color('fieldStatus', sort='descending', scale=field_scale),
-        tooltip=['moonSep', 'fieldID']
+        tooltip=['moonSep', 'fieldID'],
+        strokeOpacity=alt.condition(select_field, alt.value(1), alt.value(0))
     ).transform_filter(
         select_time
     ).add_selection(
