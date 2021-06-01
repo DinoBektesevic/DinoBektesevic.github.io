@@ -2,12 +2,6 @@ import pandas as pd
 import altair as alt
 import numpy as np
 
-def airmass(altitude, precise=False):
-    z = 90 - altitude
-    if precise:
-        return 1 / (np.cos(z) + 0.025 * np.exp(-1 * np.cos(z)))
-    return 1 / (np.cos(z))
-
 def get_data(data, moon_data=False):
     '''
     Takes the sdss field data, rounds floats, subsets to only observed fields, and calculates utcs times.
@@ -63,108 +57,132 @@ def get_data(data, moon_data=False):
     return fields, stars
 
 
-def get_moon_data(field_data):
-    '''
-    Get moon positions and phases over the course of the night
-    '''
-    moon_pos = field_data[['mjdExpStart', 'moonAz', 'moonAlt', 'moonPhase']].drop_duplicates()
-    moon_pos = moon_pos.loc[moon_pos['moonAlt'] > -.5]
-    return moon_pos
-
-
-def make_alts_plot(field_data, select_field, select_time, field_scale):
-    '''
-    Plot the altitude of fields over time.
-    '''
-    # Plot time against altitude
-    base = alt.Chart().mark_point().encode(
-        x='Observation Start Time:T',
-        y='Altitude(°):Q',
-        # color=alt.Color('fieldStatus:N', sort='descending', scale=field_scale, legend=alt.Legend(title="Field Status")),
-        color=alt.Color('fieldStatus:N', sort='descending', scale=field_scale), # cs remove legend
-        # opacity=alt.condition(select_field, alt.value(1), alt.value(0.21))
-        opacity=alt.condition(select_field, alt.value(1), alt.value(0))
-    ).add_selection(
-        select_time
-    ).transform_filter(
-        'datum.fieldStatus != "Scheduled Now"'
-    ).transform_filter(
-        {'or': ['datum.Scheduled', select_field]})
-
-    # Plot time against altitude for the currently field observed so it's always on top
-    observing_field_alts1 = alt.Chart().mark_point(filled=True).encode(
-        x='Observation Start Time:T',
-        y='Altitude(°):Q',
-        color=alt.Color('fieldStatus:N', sort='descending', scale=field_scale),
-        opacity=alt.condition(select_field, alt.value(1), alt.value(0.55)),
-        size=alt.condition(select_field, alt.value(200), alt.value(200))
-    ).transform_filter(
-        'datum.fieldStatus == "Scheduled Now"'
-    ).add_selection(
-        select_field
-    )
-
-
-    observing_field_alts = alt.Chart(field_data).mark_square(opacity=0.25, size=30, stroke='red', strokeWidth=2).encode(
-        x='Observation Start Time:T',
-        y='Altitude(°):Q',
-        color=alt.Color('fieldStatus', sort='descending', scale=field_scale),
-        tooltip=['moonSep', 'fieldID', 'completion', 'priority'],
-        strokeOpacity=alt.condition(select_field, alt.value(1), alt.value(0))
-    ).transform_filter(
-        select_time
-    ).add_selection(
-        select_field
-    )
-
-    observing_field_crosses = alt.Chart().mark_point(shape='cross', fill='#ffda60', size=60, fillOpacity=1, strokeWidth=0).encode(
-        x='Observation Start Time:T',
-        y='Altitude(°):Q',
-    ).transform_filter(
-        'datum.fieldStatus == "Scheduled Now"'
-    )
-
-    # layer all altitude plot elements together
-    alts = alt.layer(
-        base,
-        observing_field_alts,
-        observing_field_crosses,
-        # add interactive line for mouseover
-        alt.Chart().mark_rule().encode(
-            x='Observation Start Time:T'
-        ).transform_filter(select_time),
-        # add text to display datetime
-        alt.Chart().mark_text(align='left', dx=-375, dy=-150, baseline='bottom', fontSize=25, color="#C0C0C0", fontWeight=300).encode(
-            text=alt.Text('Observation Start Time:T', format="%Y-%m-%dT%H:%M:%S")
-        ).transform_filter(select_time),
-        # add text to display field Scheduled Now
-        alt.Chart().mark_text(align='left', dx=175, dy=-150, baseline='bottom', fontSize=25, color="#C0C0C0", fontWeight=500).encode(
-            text='fieldID'
-        ).transform_calculate(
-            fieldID = '"Scheduled fieldID: " + datum.fieldID'
-        ).transform_filter(select_time)
-        .transform_filter(
-            'datum.fieldStatus == "Scheduled Now"'
-        ),
-        data=field_data,
-    ).properties(
-        width=800,
-        height=200
-    )
-
-    # import pdb; pdb.set_trace()
-    # alts = alts.configure()
-    # import pdb; pdb.set_trace()
-    # alts.configure(background=)
-    # import pdb; pdb.set_trace()
-
-    return alts
-
-
-def make_sky_map(field_data, star_data, moon_data, select_field, select_time, field_scale):
+def make_viz(field_data, star_data, moon_data, select_field, select_time, field_scale):
     '''
     Create the sky mapping part of the visualization, with fields, stars, and the moon.
     '''
+    select_completion = alt.selection_interval(init={'completion': [60, 100]})
+    select_priority = alt.selection_interval(init={'priority': [3, 5]})
+    
+    def make_priority_interact(field_data, priority_selection, height=50, width=400):
+        '''histogram of priorities that is brush-linked the plots'''
+        pri = alt.Chart(field_data).mark_bar().encode(
+            x=alt.X('priority:O', title='Field Priority'),
+            y=alt.Y('count()', title='# of Fields')
+        ).add_selection(
+            priority_selection
+        ).properties(
+            height=height, 
+            width=width)
+        return pri
+
+    def make_completion_interact(field_data, completion_selection, height=50, width=400):
+        '''legend that is also brush-linked to the plots'''
+        comp = alt.layer(
+            alt.Chart(data).mark_square(size=150, fill="blue").encode(
+                x=alt.X('completion', bin=alt.Bin(extent=[0, 100], step=10), title="Field Completion")
+            ),
+
+            alt.Chart(data).mark_square(size=60, fillOpacity=0, stroke="orange").encode(
+                x=alt.X('completion', bin=alt.Bin(extent=[0, 100], step=10), title="Field Completion"),
+                strokeWidth=alt.Size('max(completion)', legend=None, bin=alt.Bin(extent=[0, 100], step=20))
+            )
+        ).add_selection(
+            completion_selection
+        ).properties(
+            height=height, 
+            width=width)
+        return comp
+    
+    
+    def make_alts_plot(field_data, select_field, select_time, field_scale):
+        '''
+        Plot the altitude of fields over time.
+        '''
+
+        # Plot time against altitude
+        base = alt.Chart().mark_point().encode(
+            x='Observation Start Time:T',
+            y='Altitude(°):Q',
+            # color=alt.Color('fieldStatus:N', sort='descending', scale=field_scale, legend=alt.Legend(title="Field Status")),
+            color=alt.Color('fieldStatus:N', sort='descending', scale=field_scale), # cs remove legend
+            # opacity=alt.condition(select_field, alt.value(1), alt.value(0.21))
+            opacity=alt.condition(select_field, alt.value(1), alt.value(0))
+        ).add_selection(
+            select_time
+        ).transform_filter(
+            'datum.fieldStatus != "Scheduled Now"'
+        ).transform_filter(
+            {'or': ['datum.Scheduled', select_field]}
+        ).add_selection(
+            select_field
+        )
+
+        # Plot time against altitude for the currently field observed so it's always on top
+        observing_field_alts1 = alt.Chart().mark_point(filled=True).encode(
+            x='Observation Start Time:T',
+            y='Altitude(°):Q',
+            color=alt.Color('fieldStatus:N', sort='descending', scale=field_scale),
+            opacity=alt.condition(select_field, alt.value(1), alt.value(0.55)),
+            size=alt.condition(select_field, alt.value(200), alt.value(200))
+        ).transform_filter(
+            'datum.fieldStatus == "Scheduled Now"'
+        ).add_selection(
+            select_field
+        )
+
+
+        observing_field_alts = alt.Chart(field_data).mark_square(opacity=0.25, size=30, stroke='red', strokeWidth=2).encode(
+            x='Observation Start Time:T',
+            y='Altitude(°):Q',
+            color=alt.Color('fieldStatus', sort='descending', scale=field_scale),
+            tooltip=['moonSep', 'fieldID', 'completion', 'priority'],
+            opacity=alt.condition(select_completion & select_priority , alt.value(1), alt.value(0)),
+            strokeOpacity=alt.condition(select_field, alt.value(1), alt.value(0))
+        ).transform_filter(
+            select_time
+        )
+
+        observing_field_crosses = alt.Chart().mark_point(shape='cross', fill='#ffda60', size=60, fillOpacity=1, strokeWidth=0).encode(
+            x='Observation Start Time:T',
+            y='Altitude(°):Q',
+        ).transform_filter(
+            'datum.fieldStatus == "Scheduled Now"'
+        )
+
+        # layer all altitude plot elements together
+        alts = alt.layer(
+            base,
+            observing_field_alts,
+            observing_field_crosses,
+            # add interactive line for mouseover
+            alt.Chart().mark_rule().encode(
+                x='Observation Start Time:T'
+            ).transform_filter(select_time),
+            # add text to display datetime
+            alt.Chart().mark_text(align='left', dx=-375, dy=-150, baseline='bottom', fontSize=25, color="#C0C0C0", fontWeight=300).encode(
+                text=alt.Text('Observation Start Time:T', format="%Y-%m-%dT%H:%M:%S")
+            ).transform_filter(select_time),
+            # add text to display field Scheduled Now
+            alt.Chart().mark_text(align='left', dx=175, dy=-150, baseline='bottom', fontSize=25, color="#C0C0C0", fontWeight=500).encode(
+                text='fieldID'
+            ).transform_calculate(
+                fieldID = '"Scheduled fieldID: " + datum.fieldID'
+            ).transform_filter(select_time)
+            .transform_filter(
+                'datum.fieldStatus == "Scheduled Now"'
+            ),
+            data=field_data,
+        ).properties(
+            width=800,
+            height=200
+        )
+
+        return alts
+    
+    completion_legend = make_completion_interact(field_data, select_completion)
+    priority_legend = make_priority_interact(field_data, select_priority)
+    
     # NSEW labels
     directions = pd.DataFrame({"lat": [-3, -3, -3, -3], "long": [0, 90, 180, 270], "text": ["N", "E", "S", "W"]})
     dir_labels = alt.Chart(directions).mark_text(fontSize=16, color="#C0C0C0").encode(
@@ -204,6 +222,7 @@ def make_sky_map(field_data, star_data, moon_data, select_field, select_time, fi
         moon_text,
         data=moon_data
     )
+    
 
     # Plot bright stars
     # https://github.com/altair-viz/altair/issues/2258 - white is not actually white?
@@ -217,22 +236,35 @@ def make_sky_map(field_data, star_data, moon_data, select_field, select_time, fi
         select_time
     )
 
-
-    # Plot fields
-    fields = alt.Chart(field_data).mark_square(opacity=0.75, size=100, stroke='red', strokeWidth=2).encode(
+    # Plot not scheduled fields
+    fields_not_scheduled = alt.Chart(field_data).mark_square(opacity=0.75, size=100).encode(
         latitude='Altitude(°)',
         longitude='az',
         color=alt.Color('fieldStatus', sort='descending', scale=field_scale),
         tooltip=['moonSep', 'fieldID', 'completion', 'priority'],
+        opacity=alt.condition(select_completion & select_priority , alt.value(1), alt.value(0))
+    ).transform_filter(
+        select_time
+    ).transform_filter(
+        '! datum.Scheduled'
+    )
+
+    # Plot scheduled fields
+    fields_scheduled = alt.Chart(field_data).mark_square(opacity=0.75, size=100, stroke='red', strokeWidth=2).encode(
+        latitude='Altitude(°)',
+        longitude='az',
+        color=alt.Color('fieldStatus', sort='descending', scale=field_scale),
+        tooltip=['moonSep', 'fieldID', 'completion', 'priority'],
+        opacity=alt.condition('datum.Scheduled', alt.value(1), alt.value(0)),
         strokeOpacity=alt.condition(select_field, alt.value(1), alt.value(0))
     ).transform_filter(
         select_time
     ).add_selection(
         select_field
     )
-
+    
     # Plot + on fields scheduled to be observed tonight
-    scheduled_fields = alt.Chart(field_data).mark_point(shape='cross', fill='#ffda60', size=60, fillOpacity=1, strokeWidth=0).encode(
+    scheduled_fields_mark = alt.Chart(field_data).mark_point(shape='cross', fill='#ffda60', size=60, fillOpacity=1, strokeWidth=0).encode(
         latitude='Altitude(°)',
         longitude='az'
     ).transform_filter(
@@ -245,7 +277,9 @@ def make_sky_map(field_data, star_data, moon_data, select_field, select_time, fi
     completion = alt.Chart(field_data).mark_square(stroke='orange', fillOpacity=0).encode(
         latitude='Altitude(°)',
         longitude='az',
-        strokeWidth=alt.Size('completion')    # thickness of stroke indicates completion
+        tooltip=['moonSep', 'fieldID', 'completion', 'priority'],
+        strokeWidth=alt.Size('completion'),    # thickness of stroke indicates completion
+        opacity=alt.condition(select_completion & select_priority , alt.value(1), alt.value(0))
     ).transform_filter(
         select_time
     ).transform_filter(
@@ -254,11 +288,11 @@ def make_sky_map(field_data, star_data, moon_data, select_field, select_time, fi
         '! datum.Scheduled')    # Don't plot of fields already scheduled
 
     # Plot field currently observed so it's on top/higher opacity
-    observing_field_skymap = alt.Chart(field_data).mark_square(opacity=1, size=80).encode(
+    field_scheduled_now = alt.Chart(field_data).mark_square(opacity=1, size=80).encode(
         latitude='Altitude(°)',
         longitude='az',
         color=alt.Color('fieldStatus', sort='descending', scale=field_scale),
-        tooltip=['moonSep', 'fieldID']
+        tooltip=['moonSep', 'fieldID', 'completion', 'priority']
     ).transform_filter(
         select_time
     ).transform_filter(
@@ -275,8 +309,25 @@ def make_sky_map(field_data, star_data, moon_data, select_field, select_time, fi
         select_field
     )
 
-    # Create sky map visualization
-    sky_map = alt.layer(
+    fields = alt.layer(
+        # fields_scheduled
+        fields_scheduled,
+        # fields not scheduled
+        fields_not_scheduled,
+        # field scheduled now
+        field_scheduled_now,
+        # + for scheduled fields
+        scheduled_fields_mark,
+        # plot completion
+        completion,
+        # field selection borders
+        selected_field,
+    ).add_selection(
+        select_field
+    )
+    
+    # Create sky map visualization 
+    sky_map = (completion_legend | priority_legend) & alt.layer(    # LAYOUT HERE priority and completion elements
         # use the sphere of the Earth as the base layer
         alt.Chart({'sphere': True}).mark_geoshape(
             color=alt.RadialGradient(
@@ -294,16 +345,8 @@ def make_sky_map(field_data, star_data, moon_data, select_field, select_time, fi
         stars,
         # moon layer
         moon,
-        # fields not being observed
+        # field layer
         fields,
-        # field currently observed
-        observing_field_skymap,
-        # + for scheduled fields
-        scheduled_fields,
-        # plot completion
-        completion,
-        # field selection borders
-        selected_field,
         # NSEW direction labels
         dir_labels,
         # altitude lables
@@ -315,8 +358,12 @@ def make_sky_map(field_data, star_data, moon_data, select_field, select_time, fi
     ).project(
         type='azimuthalEquidistant', clipAngle=90, rotate=[0,-90, 180]
     )
+    
+    # Make altitude plot
+    alts = make_alts_plot(data, select_field, select_time, field_scale)
 
-    return sky_map
+    # LAYOUT HERE skymap and altitude plot
+    return sky_map & alts
 
 def get_interactive_elements():
     '''
@@ -339,7 +386,11 @@ def get_interactive_elements():
     field_scale = alt.Scale(domain=('Scheduled Now', 'Available', 'Unavailable'),
                             # range=["#ffda60", '#a7b7bf', '#a7b7bf', '#506e7f'])
                             range=["yellow", "blue", "#6E7DDB"])
-    return select_field, select_time, field_scale
+    
+#     select_completion = alt.selection_interval(init={'completion': [60, 100]})
+#     select_priority = alt.selection_interval(init={'priority': [0, 5]})
+    return select_field, select_time, field_scale # , select_completion, select_priority
+
 
 if __name__ == "__main__":
     import warnings
@@ -354,19 +405,22 @@ if __name__ == "__main__":
         # Create interactive selection elements and scales
         select_field, select_time, field_scale = get_interactive_elements()
 
-        # Make sky plot
-        sky = make_sky_map(data, star_data, moon_pos, select_field, select_time, field_scale)
+#         # Make sky plot
+#         sky = make_sky_map(data, star_data, moon_pos, select_field, select_time, field_scale)
 
-        # Make time vs altitude plot
-        altitudes = make_alts_plot(data, select_field, select_time, field_scale)
-        # for some reason padding doesn't work?
-        # try commenting and uncommenting this line!
-        altitudes = altitudes.properties(width=400, height=300) #, padding={"left":200, "top": 0, "right": 0, "bottom": 0})
-        # import pdb; pdb.set_trace()
+#         # Make time vs altitude plot
+#         altitudes = make_alts_plot(data, select_field, select_time, field_scale)
+#         # for some reason padding doesn't work?
+#         # try commenting and uncommenting this line!
+#         altitudes = altitudes.properties(width=400, height=300) #, padding={"left":200, "top": 0, "right": 0, "bottom": 0})
+#         # import pdb; pdb.set_trace()
+        
+        # Make visualization
+        visual = make_viz(data, star_data, moon_pos, select_field, select_time, field_scale)
 
         # Configure plot
         # chart = (sky & altitudes).configure(background="white"
-        chart = (sky & altitudes).configure(background="#0e2836"
+        chart = (visual).configure(background="#0e2836"
         ).configure_axis(
             labelFontSize=20,
             titleFontSize=20,
