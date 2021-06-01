@@ -83,7 +83,7 @@ def make_alts_plot(field_data, select_field, select_time, field_scale):
     ).add_selection(
         select_time
     ).transform_filter(
-        'datum.fieldStatus != "Currently Observing"'
+        'datum.fieldStatus != "Scheduled Now"'
     )
 
     # Plot time against altitude for the currently field observed so it's always on top
@@ -94,7 +94,7 @@ def make_alts_plot(field_data, select_field, select_time, field_scale):
         opacity=alt.condition(select_field, alt.value(1), alt.value(0.55)),
         size=alt.condition(select_field, alt.value(200), alt.value(200))
     ).transform_filter(
-        'datum.fieldStatus == "Currently Observing"'
+        'datum.fieldStatus == "Scheduled Now"'
     ).add_selection(
         select_field
     )
@@ -118,7 +118,7 @@ def make_alts_plot(field_data, select_field, select_time, field_scale):
             fieldID = '"Obseving fieldID: " + datum.fieldID'
         ).transform_filter(select_time)
         .transform_filter(
-            'datum.fieldStatus == "Currently Observing"'
+            'datum.fieldStatus == "Scheduled Now"'
         ),
 
         data=field_data
@@ -207,7 +207,7 @@ def make_sky_map(field_data, star_data, moon_data, select_field, select_time, fi
     ).transform_filter(
         select_time
     ).transform_filter(
-        'datum.fieldStatus == "Currently Observing"'
+        'datum.fieldStatus == "Scheduled Now"'
     )
 
     # Add red border to selected fields
@@ -277,7 +277,7 @@ def get_interactive_elements():
     select_field = alt.selection_multi(on='click', fields=['fieldID'], empty='none')
 
     # Set up color scheme for field status
-    field_scale = alt.Scale(domain=('Currently Observing', 'Available', 'Unavailable'),
+    field_scale = alt.Scale(domain=('Scheduled Now', 'Available', 'Unavailable'),
                             range=["#ffda60", '#a7b7bf', '#506e7f'])
     return select_field, select_time, field_scale
 
