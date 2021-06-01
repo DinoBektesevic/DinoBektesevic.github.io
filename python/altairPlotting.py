@@ -269,6 +269,8 @@ def make_sky_map(field_data, star_data, moon_data, select_field, select_time, fi
         observing_field_skymap,
         # + for scheduled fields
         scheduled_fields,
+        # plot completion
+        completion,
         # field selection borders
         selected_field,
         # NSEW direction labels
