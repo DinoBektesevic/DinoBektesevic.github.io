@@ -199,6 +199,28 @@ def make_sky_map(field_data, star_data, moon_data, select_field, select_time, fi
     ).add_selection(
         select_field
     )
+    
+    # Plot + on fields scheduled to be observed tonight
+    scheduled_fields = alt.Chart(field_data).mark_point(shape='cross', fill='#ffda60', size=60, fillOpacity=1, strokeWidth=0).encode(
+        latitude='Altitude(°)',
+        longitude='az'
+    ).transform_filter(
+        select_time
+    ).transform_filter(
+        'datum.Scheduled'
+    )
+    
+    # Plot completion
+    completion = alt.Chart(field_data).mark_square(stroke='orange', fillOpacity=0).encode(
+        latitude='Altitude(°)',
+        longitude='az',
+        strokeWidth=alt.Size('completion')    # thickness of stroke indicates completion
+    ).transform_filter(
+        select_time
+    ).transform_filter(
+        'datum.fieldStatus == "Available"'    # Only plot for available fields
+    ).transform_filter(
+        '! datum.Scheduled')    # Don't plot of fields already scheduled
 
     # Plot field currently observed so it's on top/higher opacity
     observing_field_skymap = alt.Chart(field_data).mark_square(opacity=1, size=80).encode(
@@ -245,6 +267,8 @@ def make_sky_map(field_data, star_data, moon_data, select_field, select_time, fi
         fields,
         # field currently observed
         observing_field_skymap,
+        # + for scheduled fields
+        scheduled_fields,
         # field selection borders
         selected_field,
         # NSEW direction labels
