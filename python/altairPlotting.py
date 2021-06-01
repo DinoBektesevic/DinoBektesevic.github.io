@@ -85,7 +85,7 @@ def make_alts_plot(field_data, select_field, select_time, field_scale):
     ).transform_filter(
         'datum.fieldStatus != "Scheduled Now"'
     ).transform_filter(
-        'datum.Scheduled')
+        {'or': ['datum.Scheduled', select_field]})
 
     # Plot time against altitude for the currently field observed so it's always on top
     observing_field_alts = alt.Chart().mark_point(filled=True).encode(
