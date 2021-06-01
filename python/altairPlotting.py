@@ -307,7 +307,8 @@ def get_interactive_elements():
 
     # Set up color scheme for field status
     field_scale = alt.Scale(domain=('Scheduled Now', 'Available', 'Unavailable'),
-                            range=["#ffda60", '#a7b7bf', '#506e7f'])
+                            # range=["#ffda60", '#a7b7bf', '#a7b7bf', '#506e7f'])
+                            range=["yellow", "blue", "#6E7DDB"])
     return select_field, select_time, field_scale
 
 if __name__ == "__main__":
