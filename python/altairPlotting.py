@@ -8,7 +8,7 @@ def get_data(data, moon_data=True):
     '''
     field_cols = ['Altitude(°)', 'az', 'moonSep', 'fieldID', 'objType', 'fieldStatus', 'Observation Start Time', 'time_step_id', 'priority', 'completion', 'Scheduled']
     star_cols = ['Altitude(°)', 'az', 'time_step_id', 'Stellar Magnitude']
-    moon_cols = ['moonAlt', 'moonAz', 'time_step_id', 'fieldID']
+    moon_cols = ['moonAlt', 'moonAz', 'time_step_id', 'fieldID', 'phase_icon']
     # round columms
     for col in data.dtypes[data.dtypes == 'float64'].index:
         data[col] = round(data[col], 6)
@@ -47,11 +47,27 @@ def get_data(data, moon_data=True):
 
     # Get moon data
     if moon_data:
-        moon = fields[['mjdExpStart', 'moonAz', 'moonAlt']].drop_duplicates()
+        moon = fields[['mjdExpStart', 'moonAz', 'moonAlt', 'moonPhase']].drop_duplicates()
         moon = moon.loc[moon['moonAlt'] > -.5]
         moon['time_step_id'] = [ts[mjd] for mjd in moon['mjdExpStart']]
         moon['fieldID'] = 'moon'
 
+        
+        avg_moon_phase = np.nanmean(moon['moonPhase'])
+        phase_dict = {'🌑': [0,.1],
+                    '🌒': [.1,.3],
+                    '🌓': [.3,.7],
+                    '🌔': [.7,.9],
+                    '🌕': [.9,1]}
+        phase_icon = []
+        for i in range(len(phase_dict)):
+            rng  = list(phase_dict.values())[i]
+            char = list(phase_dict.keys())[i]
+            if rng[0] <= avg_moon_phase < rng[1]:
+                phase_icon.append(char)
+            
+        moon['phase_icon'] = [phase_icon[0] for i in range(len(moon))]
+        
         return fields[field_cols], stars[star_cols], moon[moon_cols]
 
     return fields, stars
@@ -186,9 +202,10 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
         latitude="lat",
         text="text")
 
-    moon_base = alt.Chart().mark_text(size=26, text='🌗').encode(
+    moon_base = alt.Chart().mark_text(size=26).encode(
         latitude='moonAlt',
-        longitude='moonAz'
+        longitude='moonAz',
+        text='phase_icon'
     ).transform_filter(
         select_time
     )
@@ -405,7 +422,9 @@ if __name__ == "__main__":
     for mjd in range(59390, 59391):
         print(mjd)
         # Read data and preprocess
-        df = pd.read_csv(f'../data/full_data/mjd-{mjd}-sdss-simple-expanded-priority.csv', index_col=0)
+        # df = pd.read_csv(f'../data/full_data/mjd-{mjd}-sdss-simple-expanded-priority.csv', index_col=0)
+        df = pd.read_csv('mjd-59305-sdss-simple-expanded-priority.csv', index_col=0)
+        df['moonPhase'] = .01
         data, star_data, moon_pos = get_data(df, moon_data=True)
         # moon_pos = pd.read_csv('../data/moon-positions-mjd-59418.csv')
 
@@ -461,4 +480,4 @@ if __name__ == "__main__":
 
         # Save as html
         # chart.save(f"../data/viz_jsons/altair_{mjd}.html")
-        chart.save(f"altair_{mjd}_horizontal.html")
+        chart.save(f"altair_with_moon_final.html")
