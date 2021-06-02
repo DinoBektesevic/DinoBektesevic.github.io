@@ -5,11 +5,11 @@
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega@5"></script>
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-lite@4.8.1"></script>
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-embed@6"></script>
+        <script type="text/javasctipt" src="https://d3js.org/d3.v6.min.js"></script>
         <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
-        <title> CSE 512 A3 </title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="an\
-onymous">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
         <link rel="stylesheet" href="css/main.css">
+        <title> CSE 512 A3 </title>
         <style>
          .error {
              color: red;
@@ -24,82 +24,64 @@ onymous">
 
             <!--
                  This is the meat of the content, our paragraphs, and the plot.
-                       There are two rows and two columns on the page. First row first column is intro, second is rationality.
-                       The rows and columns in the second row are set to resize according to content. Titles are h and paragraphs are p tags.
+                 There are two rows and two columns on the page. First row first column is intro, second is rationality.
+                 The rows and columns in the second row are set to resize according to content. Titles are h and paragraphs are p tags.
             -->
             <div class="row">
                 <div class="col">
                     <h2>Goals</h2>
-                    <p class="text-justify">Our goal for this project was to develop a tool to visualize an observing plan (or schedule) their observation strategy for each night on the <a href="https://www.sds\
-s.org/">Sloan Digital Sky Survey (SDSS)</a> - a survey designed to observe ~6 million stars, galaxies, and supermassive black holes over the next 5 years. Planning an optimal nightly observing strategy for targ\
-ets of interest (e.g. stars, galaxies, quasars) depends on a variety of factors, such as telescope position, time of year, as well as nightly varying parameters, such as moon position and object altitude. Ideal\
-ly an astronomer would want to observe objects which have a large separation from the moon (to reduce brightness contamination) and high altitude (to reduce the airmass, or amount of Earth’s atmosphere that you\
- are looking through). Some of these factors are subject to change (for example due to the weather conditions of that night), which requires adapting on the fly. This makes a visual interface for quickly pickin\
-g out targets extremely useful.  Using the interface below, explore for yourself how to plan a nightly observing strategy for SDSS!</p>
+                    <p class="text-justify">Our goal for this project was to develop a tool to visualize an observing plan (or schedule) their observation strategy for each night on the <a href="https://www.sdss.org/">Sloan Digital Sky Survey (SDSS)</a> - a survey designed to observe ~6 million stars, galaxies, and supermassive black holes over the next 5 years. Planning an optimal nightly observing strategy for targ\
+                        ets of interest (e.g. stars, galaxies, quasars) depends on a variety of factors, such as telescope position, time of year, as well as nightly varying parameters, such as moon position and object altitude. Ideal\
+                        ly an astronomer would want to observe objects which have a large separation from the moon (to reduce brightness contamination) and high altitude (to reduce the airmass, or amount of Earth’s atmosphere that you\
+                        are looking through). Some of these factors are subject to change (for example due to the weather conditions of that night), which requires adapting on the fly. This makes a visual interface for quickly pickin\
+                        g out targets extremely useful.  Using the interface below, explore for yourself how to plan a nightly observing strategy for SDSS!</p>
                 </div>
                 <div class="col">
                     <h2>How to use</h2>
                     <h4>1. Orienting yourself on the sky</h4>
                     <p class="text-justify"><span style="font-weight: bold">The top plot visualizes the entire night sky that would be visible on July 23, 2021 at the observing site in New Mexico, based on simu\
-lated data.</span> The radial axis (labeled 0, 30, 60, and 90 degrees) represents the angle on the sky from the horizon, where <span style="font-weight: bold">90 degrees would be looking straight up, and 0 degr\
-ees would be directly on the horizon</span>. In this case the telescope would be facing South, with the West to the right, and East to the left, as indicated by the N/E/S/W markers at each quadrant of the plot.\
- To give an intuitive frame of reference, <span style="font-weight: bold">a few hundred stars are plotted in grey</span> according to their magnitudes (0 magnitude = brightest, and 4 magnitude = faintest, as in\
-dicated by the size chart on the right-hand column). All of these stars are bright enough to be seen by the human eye, so you may be able to recognize some constellation patterns among these background stars.  \
- </p>
+                        lated data.</span> The radial axis (labeled 0, 30, 60, and 90 degrees) represents the angle on the sky from the horizon, where <span style="font-weight: bold">90 degrees would be looking straight up, and 0 degr\
+                        ees would be directly on the horizon</span>. In this case the telescope would be facing South, with the West to the right, and East to the left, as indicated by the N/E/S/W markers at each quadrant of the plot.\
+                        To give an intuitive frame of reference, <span style="font-weight: bold">a few hundred stars are plotted in grey</span> according to their magnitudes (0 magnitude = brightest, and 4 magnitude = faintest, as in\
+                        dicated by the size chart on the right-hand column). All of these stars are bright enough to be seen by the human eye, so you may be able to recognize some constellation patterns among these background stars.  \
+                    </p>
                 </div>
             </div>
             <div class="row">
                 <div class="col">
                     <h4>2. Understanding fields</h4>
                     <p class="text-justify">While the top plot shows the entire sky, <span style="font-weight: bold">we can only choose to point the telescope at a small fraction of the sky at a time</span>. On\
- the sky plot you’ll find a number of dark or light blue squares representing observing “fields”, or regions containing an object (star, galaxy, quasar) that we want to collect data on. <span style="font-weight\
-: bold">The dark blue squares <span style="background-color: #1f77b4">&nbsp;</span> represent the fields which are “available” to observe at a given time</span> in the night, while the <span style="font-weight:\
- bold">light blue squares <span style="background-color:#aec7e8">&nbsp;</span> represent “unavailable” fields. The yellow square <span style="background-color:yellow">&nbsp;</span> represents the field being ob\
-served at that time</span>. The availability of different fields changes over time based on the altitude: if a field is less than 40 degrees above the horizon, Earth’s atmosphere becomes too thick for the teles\
-cope to expose through, and might also become obstructed by stuff like trees on the horizon.</p>
+                        the sky plot you’ll find a number of dark or light blue squares representing observing “fields”, or regions containing an object (star, galaxy, quasar) that we want to collect data on. <span style="font-weight: bold">The dark blue squares <span style="background-color: #1f77b4">&nbsp;</span> represent the fields which are “available” to observe at a given time</span> in the night, while the <span style="font-weight: bold">light blue squares <span style="background-color:#aec7e8">&nbsp;</span> represent “unavailable” fields. The yellow square <span style="background-color:yellow">&nbsp;</span> represents the field being ob\
+                        served at that time</span>. The availability of different fields changes over time based on the altitude: if a field is less than 40 degrees above the horizon, Earth’s atmosphere becomes too thick for the teles\
+                        cope to expose through, and might also become obstructed by stuff like trees on the horizon.</p>
                     <h4>3. Interaction </h4>
                     <p class="text-justify">Because the altitude of a field dictates its observability, the lower panel visualizes the altitude of each of the fields as a function of time time of night, which s\
-pans 8:30pm to 5:30am in 18 min increments. <span style="font-weight: bold">Hovering over the time axis in the bottom panel with your mouse will allow you to scroll through different times and update the sky pl\
-ot above.</span></p>
+                        pans 8:30pm to 5:30am in 18 min increments. <span style="font-weight: bold">Hovering over the time axis in the bottom panel with your mouse will allow you to scroll through different times and update the sky pl\
+                        ot above.</span></p>
                 </div>
                 <div class="col">
-                    <p>
-                        <select name="night-data", id="night-data">
-                            <option value="59390">59390</option>
-                            <option value="59391">59391</option>
-                            <option value="59392">59392</option>
-                            <option value="59393">59393</option>
-                            <option value="59394">59394</option>
-                            <option value="59395">59395</option>
-                            <option value="59396">59396</option>
-                            <option value="59397">59397</option>
-                            <option value="59398">59398</option>
-                            <option value="59399">59399</option>
-                            <option value="59400">59400</option>
-                            <option value="59401">59401</option>
-                            <option value="59402">59402</option>
-                            <option value="59403">59403</option>
-                            <option value="59404">59404</option>
-                            <option value="59405">59405</option>
-                            <option value="59406">59406</option>
-                            <option value="59407">59407</option>
-                            <option value="59408">59408</option>
-                            <option value="59409">59409</option>
-                            <option value="59410">59410</option>
-                            <option value="59411">59411</option>
-                            <option value="59412">59412</option>
-                            <option value="59413">59413</option>
-                            <option value="59414">59414</option>
-                            <option value="59415">59415</option>
-                            <option value="59416">59416</option>
-                            <option value="59416">59416</option>
-                            <option value="59417">59417</option>
-                            <option value="59418">59418</option>
-                            <option value="59419">59419</option>
-                            <option value="59420">59420</option>
-                        </select></p>
                     <!-- This is where the plot goes, identified by the div ID  -->
-                        <div id="vis" class="d-flex justify-content-center"></div>
+                    <div class="row">
+                        <div class="text-center">
+                            <h3>SDSS Nights in a Year</h3>
+                            <label for="datePlotEncoding">Set column for color encoding:</label>
+                            <select class="form-select form-select-sm" id="datePlotEncoding">
+                                <option value="nFields">Num. of Fields</option>
+                                <option value="obsHours">Hours of Observing</option>
+                                <option value="moonPhase">Moon Phase</option>
+                                <option value="moonHours">Hours Moon is Visible</option>
+                                <option value="brightPercent">% of night Moon is visible</option>
+                                <option value="darkPercent">% of night Moon is not visible</option>
+                            </select>
+                            <svg id="timePlot", width="900", height="500"></svg>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="text-center">
+                            <h3 id="skyPlotTitle"> SDSS Sky, star date 59305</h3>
+                            <div id="vis" class="d-flex justify-content-center"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -108,16 +90,16 @@ ot above.</span></p>
                 <div class="col">
                     <p><br></p>
                     <p class="text-justify"><span style="font-weight: bold">To get more information on a field, you can hover over each of the squares</span>, which will tell you the field identification number\
-, as well as the degree separation from the moon. The moon separation can be an important variable to consider, particularly when observing faint sources, which can be washed out by the moon.</p>
+                        , as well as the degree separation from the moon. The moon separation can be an important variable to consider, particularly when observing faint sources, which can be washed out by the moon.</p>
                     <p>Additionally, <span style="font-weight: bold">you can also click on a field (on either the top sky plot or bottom altitude plot)</span>, and that will <span style="font-weight: bold">outl\
-ine the field in <span style="color: red">red</span></span> on the sky plot, <span style="font-weight: bold">and bold the corresponding points</span> on the altitude plot.</p>
+                        ine the field in <span style="color: red">red</span></span> on the sky plot, <span style="font-weight: bold">and bold the corresponding points</span> on the altitude plot.</p>
                 </div>
                 <div class="col">
                     <h4>4. Simulate an observing strategy </h4>
                     <p class="text-justify">Finally, putting all of these pieces together, we can simulate an observing strategy and visually inspect whether it looks feasible, or consider alternate strategies.\
- An example observing plan for the night is shown in both panels in yellow. For each time increment, the telescope would choose a different field to observe, and attempt to maximize the number of fields it can \
-visit in a night. <span style="font-weight: bold">This tool would then allow an astronomer to easily see what an observing plan for the night looks like, and dynamically replan things if the observing condition\
-s change during the night.</span></p>
+                        An example observing plan for the night is shown in both panels in yellow. For each time increment, the telescope would choose a different field to observe, and attempt to maximize the number of fields it can \
+                        visit in a night. <span style="font-weight: bold">This tool would then allow an astronomer to easily see what an observing plan for the night looks like, and dynamically replan things if the observing condition\
+                        s change during the night.</span></p>
                     <p>For more details, see our full repository: <a href="https://github.com/cse512-21s/A3-astroviz">https://github.com/cse512-21s/A3-astroviz</a> </p>
 
                 </div>
@@ -132,8 +114,10 @@ s change during the night.</span></p>
              drawing.
         -->
         <script>
+         // THE FOLLOWING IS CODE REQUIRED TO REPLOT THE SKY
          function createURI(date, filename){
-             let baseUrl =  "json_data/";
+             // let baseUrl =  "json_data/";
+             let baseUrl =  "data/json_data/";
              return baseUrl+date.toString()+"/"+filename.toString();
          };
 
@@ -168,11 +152,152 @@ s change during the night.</span></p>
                  .catch(error => showError(el, error));
          };
 
-         replot(vegaEmbed, 59390);
 
-         document.getElementById('night-data').addEventListener('change', function() {
-             replot(vegaEmbed, this.value);
+
+         // THE FOLLOWING IS THE CODE FOR THE DATE PLOT
+         function mouseOut(event, d){
+             const g = d3.select(event.target.parentNode);
+             g.selectAll("text").remove();
+             g.selectAll("circle").remove();
+         };
+
+         function mouseOver(event, d){
+             const g = d3.select(event.target.parentNode);
+
+             g.append("circle")
+              .attr("transform",`translate(${x.bandwidth()/2}, ${y.bandwidth()/2})`)
+              .attr("r", d3.min([x.bandwidth()/2, y.bandwidth()/2]))
+              .attr("fill", "#fff")
+              .attr("opacity", 0.5)
+              .style("pointer-events", "none");
+
+             g.append("text")
+              .text(d.value.toFixed(2))
+              .attr("transform", `translate(${x.bandwidth()/2}, ${y.bandwidth()/2})`)
+              .attr("dy", "0.1em")
+              .attr("style", `fill:black; font-size: 10px; font-family: sans-serif;`)
+              .attr("text-anchor", "middle")
+              .attr("alignment-baseline", "middle")
+              .style("pointer-events", "none");
+         };
+
+         function mouseClick(event, d){
+             var title = d3.select("#skyPlotTitle");
+             title.text("SDSS Sky, star date " + d.mjd);
+             replot(vegaEmbed, d.mjd);
+         };
+
+         function simplePlot(elementid="#timePlot", col="nFields"){
+             var svg = d3.select(elementid);
+             margin = ({top: 0, right:0, bottom: 0, left: 50});
+		         width = svg.attr("width") - margin.top - margin.bottom;
+		         height = svg.attr("height") - margin.left - margin.right;
+
+             //svg.append("text")
+		         //   .attr("transform", "translate(100,0)")
+		         //   .attr("x", 50).attr("y", 50)
+		         //   .attr("font-size", "20px")
+		         //   .attr("class", "title")
+		         //   .text("SDSS Nights in a Year");
+
+             x = d3.scaleBand()
+                   .domain([...Array(31).keys()].map(d=>d+1))
+                   .range([margin.left, width - margin.right])
+
+             monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+             y = d3.scaleBand()
+                   .domain(monthNames)
+                   .range([margin.top, height-margin.bottom])
+
+		         d3.json("data/fieldCalendar.json").then(function(data) {
+
+                 // how the heck does one append a column? Column "value" is the dropdown selector.
+                 var filteredData = data.map(function(d){return {
+                     mjd: d.mjd,
+                     moonPhase: d.moonPhase,
+                     moonHours: d.moonHours,
+                     obsHours: d.obsHours,
+                     darkPercent: d.darkPercent,
+                     brightPercent: d.brightPercent,
+                     monthName: d.monthName,
+                     monthInt: d.monthInt,
+                     year: d.year,
+                     dayOfYear: d.dayOfYear,
+                     dayOfMonth: d.dayOfMonth,
+                     nFields: d.nFields,
+                     value:d[col]}
+                 })
+
+                 colorScale = d3.scaleSequential(d3.interpolateCividis)
+                                .domain(d3.extent(filteredData, d=>d.value).reverse());
+
+                 svg.append("g")
+                    .attr("transform", `translate(0, ${height-margin.bottom})`)
+                    .call(d3.axisBottom(x))
+                    .append("text")
+                    .attr("style", `fill:black; font-weight: 700; font-size: 12px`)
+                    .attr("transform",`translate(${(width-margin.right-margin.left)/2 + margin.left}, 35)`)
+                    .text("Day of month");
+
+                 svg.append("g")
+                    .attr("transform", `translate(${margin.left},0)`)
+                    .call(d3.axisLeft(y))
+                    .append("text")
+                    .attr("style", `fill:black; font-weight: 700; font-size: 12px`)
+                    .attr("text-anchor", "middle")
+                    .attr("transform",`translate(-55,${(height-margin.bottom-margin.top)/2 + margin.top}),rotate(-90)`)
+                    .text("Month");
+
+                 svg.append("g")
+                    .classed("cells", true)
+                    .selectAll("g.cells")
+                 //.data(data)
+                    .data(filteredData)
+                    .join("g")
+                    .attr("transform",d => `translate(${x(d.dayOfMonth)}, ${y(d.monthName)})`)
+                    .append("rect")
+                    .attr("width", x.bandwidth())
+                    .attr("height", y.bandwidth())
+                    .attr("fill", d => colorScale(d.value))
+                    .on("mouseover", (event, d) => mouseOver(event, d))
+                    .on("mouseout", (event, d) => mouseOut(event, d))
+                    .on("mouseclick", (event, d) => mouseClick(event, d));
+
+                 svg.append("g")
+                    .classed("cells", true)
+                    .selectAll("g.cells")
+                 //.data(data)
+                    .data(filteredData)
+                    .join("g")
+                    .attr("transform",d => `translate(${x(d.dayOfMonth)}, ${y(d.monthName)})`)
+                    .append("rect")
+                    .attr("width", x.bandwidth())
+                    .attr("height", y.bandwidth())
+                    .attr("fill", d => colorScale(d.value))
+                    .on("mouseover", (event, d) => mouseOver(event, d))
+                    .on("mouseout", (event, d) => mouseOut(event, d))
+                    .on("click", (event, d) => mouseClick(event, d));
+
+
+                 svg.append("g")
+                    .attr("transform", `translate(${margin.left},${height-50})`)
+                 return svg.node()
+		         });
+         };
+
+         document.getElementById('datePlotEncoding').addEventListener('change', function() {
+             simplePlot("#timePlot", this.value);
          });
+
+
+
+
+
+         // THE FOLLOWING IS THE CODE THAT CREATES THE INITAL PLOTS
+         document.addEventListener('DOMContentLoaded', function(){
+             replot(vegaEmbed, 59305);
+             simplePlot("#timePlot", this.value);
+         })
         </script>
     </body>
 </html>
