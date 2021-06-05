@@ -1,40 +1,35 @@
 import pandas as pd
-import altair as alt
-import numpy as np
-import json
 import os
-import tqdm
 
-from .altairPlotting import get_data
+from altairPlotting import get_data
+
+
+DATA_IN_DIR="../../full_data/"
+DATA_OUT_DIR="../../data/"
 
 
 if __name__ == "__main__":
-    
-    import warnings
-    warnings.simplefilter(action='ignore')
+    if not os.path.exists(DATA_OUT_DIR):
+        os.mkdir(DATA_OUT_DIR)
 
-    for mjd in tqdm.tqdm(range(59305, 59670)):
-        # Create json save directory
-        save_dir=f'json_data_v2/{mjd}/'
-        if not os.path.exists(save_dir):
-            os.mkdir(save_dir)
-            
+    for mjd in range(59305, 59670):
+        import warnings
+        warnings.simplefilter(action='ignore')
+
+        save_path = os.path.join(DATA_OUT_DIR, str(mjd))
+        if not os.path.exists(save_path):
+            os.mkdir(save_path)
+
         # Read data and preprocess
-        file = f"simpleExpandedPriorityV2/mjd-{mjd}-sdss-simple-expanded-priority.csv"
+        file = os.path.join(DATA_IN_DIR, f"mjd-{mjd}-sdss-simple-expanded-priority.csv")
         df = pd.read_csv(file, index_col=0)
-        data, star_data, moon_data = get_data(df, moon_data=True)
-        
-        # Save star json
-        star_json = star_data.to_json(orient='records')
-        with open(save_dir + "stars.json", "w") as outfile: 
-            json.dump(star_json, outfile)
-            
-        # Save field json
-        field_json = data.to_json(orient='records')
-        with open(save_dir + "fields.json", "w") as outfile: 
-            json.dump(field_json, outfile)
-            
-        # Save moon json
-        moon_json = moon_data.to_json(orient='records')
-        with open(save_dir + "moon.json", "w") as outfile: 
-            json.dump(moon_json, outfile)
+        data = get_data(df, moon_data=True)
+
+        for name, datum in zip(("fields.json", "stars.json",  "moon.json"), data):
+            outPath = os.path.join(save_path, name)
+            datum.to_json(outPath, orient='records', double_precision=2, date_unit="s")
+
+
+#    field_cols = ['Altitude(°)', 'az', 'moonSep', 'fieldID', 'objType', 'fieldStatus', 'Observation Start Time', 'time_step_id', 'priority', 'completion', 'Scheduled']
+#    star_cols = ['Altitude(°)', 'az', 'time_step_id', 'Stellar Magnitude']
+#    moon_cols = ['moonAlt', 'moonAz', 'time_step_id', 'fieldID', 'phase_icon']
