@@ -1,7 +1,13 @@
 {
     "config": {
-        "view": {"continuousWidth": 400, "continuousHeight": 300, "strokeWidth": 0},
-        "axis": {"grid": false},
+        "view": {
+            "continuousWidth": 400,
+            "continuousHeight": 300,
+            "strokeWidth": 0
+        },
+        "axis": {
+            "grid": false
+        },
         "axisBottom": {
             "labelColor": "#C0C0C0",
             "labelFontSize": 14,
@@ -15,8 +21,13 @@
             "titleFontSize": 20
         },
         "background": "#0e2836",
-        "legend": {"labelColor": "#C0C0C0", "titleColor": "#C0C0C0"},
-        "title": {"fontSize": 24}
+        "legend": {
+            "labelColor": "#C0C0C0",
+            "titleColor": "#C0C0C0"
+        },
+        "title": {
+            "fontSize": 24
+        }
     },
     "hconcat": [
         {
@@ -41,7 +52,13 @@
                                     "format": "%Y-%m-%dT%H:%M:%S"
                                 }
                             },
-                            "transform": [{"filter": {"selection": "selector001"}}]
+                            "transform": [
+                                {
+                                    "filter": {
+                                        "selection": "selector001"
+                                    }
+                                }
+                            ]
                         },
                         {
                             "mark": {
@@ -54,14 +71,25 @@
                                 "fontSize": 25,
                                 "fontWeight": 500
                             },
-                            "encoding": {"text": {"type": "nominal", "field": "fieldID"}},
+                            "encoding": {
+                                "text": {
+                                    "type": "nominal",
+                                    "field": "fid"
+                                }
+                            },
                             "transform": [
                                 {
-                                    "calculate": "\"Scheduled fieldID: \" + datum.fieldID",
-                                    "as": "fieldID"
+                                    "calculate": "\"Scheduled fid: \" + datum.fid",
+                                    "as": "fid"
                                 },
-                                {"filter": {"selection": "selector001"}},
-                                {"filter": "datum.fieldStatus == \"Scheduled Now\""}
+                                {
+                                    "filter": {
+                                        "selection": "selector001"
+                                    }
+                                },
+                                {
+                                    "filter": "datum.fS == \"Scheduled Now\""
+                                }
                             ]
                         }
                     ]
@@ -73,19 +101,34 @@
                                 {
                                     "layer": [
                                         {
-                                            "mark": {"type": "square", "fill": "blue", "size": 150},
+                                            "mark": {
+                                                "type": "square",
+                                                "fill": "blue",
+                                                "size": 150
+                                            },
                                             "encoding": {
                                                 "x": {
                                                     "type": "quantitative",
-                                                    "bin": {"extent": [0, 100], "step": 10},
-                                                    "field": "completion",
+                                                    "bin": {
+                                                        "extent": [
+                                                            0,
+                                                            100
+                                                        ],
+                                                        "step": 10
+                                                    },
+                                                    "field": "c",
                                                     "title": "Field Completion"
                                                 }
                                             },
                                             "selection": {
                                                 "selector003": {
                                                     "type": "interval",
-                                                    "init": {"completion": [60, 100]}
+                                                    "init": {
+                                                        "c": [
+                                                            60,
+                                                            100
+                                                        ]
+                                                    }
                                                 }
                                             }
                                         },
@@ -100,14 +143,26 @@
                                                 "strokeWidth": {
                                                     "type": "quantitative",
                                                     "aggregate": "max",
-                                                    "bin": {"extent": [0, 100], "step": 20},
-                                                    "field": "completion",
+                                                    "bin": {
+                                                        "extent": [
+                                                            0,
+                                                            100
+                                                        ],
+                                                        "step": 20
+                                                    },
+                                                    "field": "c",
                                                     "legend": null
                                                 },
                                                 "x": {
                                                     "type": "quantitative",
-                                                    "bin": {"extent": [0, 100], "step": 10},
-                                                    "field": "completion",
+                                                    "bin": {
+                                                        "extent": [
+                                                            0,
+                                                            100
+                                                        ],
+                                                        "step": 10
+                                                    },
+                                                    "field": "c",
                                                     "title": "Field Completion"
                                                 }
                                             }
@@ -121,7 +176,7 @@
                                     "encoding": {
                                         "x": {
                                             "type": "ordinal",
-                                            "field": "priority",
+                                            "field": "p",
                                             "title": "Field Priority"
                                         },
                                         "y": {
@@ -134,7 +189,12 @@
                                     "selection": {
                                         "selector004": {
                                             "type": "interval",
-                                            "init": {"priority": [3, 5]}
+                                            "init": {
+                                                "p": [
+                                                    3,
+                                                    5
+                                                ]
+                                            }
                                         }
                                     },
                                     "width": 300
@@ -144,27 +204,52 @@
                         {
                             "layer": [
                                 {
-                                    "mark": {"type": "rule", "color": "#C0C0C0"},
-                                    "encoding": {
-                                        "x": {"type": "temporal", "field": "Observation Start Time"}
+                                    "mark": {
+                                        "type": "rule",
+                                        "color": "#C0C0C0"
                                     },
-                                    "transform": [{"filter": {"selection": "selector001"}}]
+                                    "encoding": {
+                                        "x": {
+                                            "type": "temporal",
+                                            "field": "Observation Start Time"
+                                        }
+                                    },
+                                    "transform": [
+                                        {
+                                            "filter": {
+                                                "selection": "selector001"
+                                            }
+                                        }
+                                    ]
                                 },
                                 {
                                     "mark": "point",
                                     "encoding": {
                                         "color": {
                                             "type": "nominal",
-                                            "field": "fieldStatus",
-                                            "legend": {"title": "Field Status"},
+                                            "field": "fS",
+                                            "legend": {
+                                                "title": "Field Status"
+                                            },
                                             "scale": {
-                                                "domain": ["Scheduled Now", "Available", "Unavailable"],
-                                                "range": ["yellow", "blue", "#6E7DDB"]
+                                                "domain": [
+                                                    "Scheduled Now",
+                                                    "Available",
+                                                    "Unavailable"
+                                                ],
+                                                "range": [
+                                                    "yellow",
+                                                    "blue",
+                                                    "#6E7DDB"
+                                                ]
                                             },
                                             "sort": "descending"
                                         },
                                         "opacity": {
-                                            "condition": {"value": 1, "selection": "selector002"},
+                                            "condition": {
+                                                "value": 1,
+                                                "selection": "selector002"
+                                            },
                                             "value": 0
                                         },
                                         "x": {
@@ -173,8 +258,13 @@
                                         },
                                         "y": {
                                             "type": "quantitative",
-                                            "field": "Altitude(°)",
-                                            "scale": {"domain": [0, 90]}
+                                            "field": "Altitude(\u00b0)",
+                                            "scale": {
+                                                "domain": [
+                                                    0,
+                                                    90
+                                                ]
+                                            }
                                         }
                                     },
                                     "selection": {
@@ -183,21 +273,34 @@
                                             "on": "mouseover",
                                             "nearest": true,
                                             "empty": "none",
-                                            "fields": ["time_step_id"],
-                                            "init": {"time_step_id": 0}
+                                            "fields": [
+                                                "tsid"
+                                            ],
+                                            "init": {
+                                                "tsid": 0
+                                            }
                                         },
                                         "selector002": {
                                             "type": "multi",
                                             "on": "click",
-                                            "fields": ["fieldID"],
+                                            "fields": [
+                                                "fid"
+                                            ],
                                             "empty": "none"
                                         }
                                     },
                                     "transform": [
-                                        {"filter": "datum.fieldStatus != \"Scheduled Now\""},
+                                        {
+                                            "filter": "datum.fS != \"Scheduled Now\""
+                                        },
                                         {
                                             "filter": {
-                                                "or": ["datum.Scheduled", {"selection": "selector002"}]
+                                                "or": [
+                                                    "datum.Scheduled",
+                                                    {
+                                                        "selection": "selector002"
+                                                    }
+                                                ]
                                             }
                                         }
                                     ]
@@ -213,43 +316,59 @@
                                     "encoding": {
                                         "color": {
                                             "type": "nominal",
-                                            "field": "fieldStatus",
+                                            "field": "fS",
                                             "scale": {
-                                                "domain": ["Scheduled Now", "Available", "Unavailable"],
-                                                "range": ["yellow", "blue", "#6E7DDB"]
+                                                "domain": [
+                                                    "Scheduled Now",
+                                                    "Available",
+                                                    "Unavailable"
+                                                ],
+                                                "range": [
+                                                    "yellow",
+                                                    "blue",
+                                                    "#6E7DDB"
+                                                ]
                                             },
                                             "sort": "descending"
                                         },
                                         "opacity": {
                                             "condition": {
                                                 "value": 1,
-                                                "selection": {"and": ["selector003", "selector004"]}
+                                                "selection": {
+                                                    "and": [
+                                                        "selector003",
+                                                        "selector004"
+                                                    ]
+                                                }
                                             },
                                             "value": 0
                                         },
                                         "strokeOpacity": {
-                                            "condition": {"value": 1, "selection": "selector002"},
+                                            "condition": {
+                                                "value": 1,
+                                                "selection": "selector002"
+                                            },
                                             "value": 0
                                         },
                                         "tooltip": [
                                             {
                                                 "type": "quantitative",
-                                                "field": "moonSep",
+                                                "field": "mS",
                                                 "title": "Moon separation: "
                                             },
                                             {
                                                 "type": "nominal",
-                                                "field": "fieldID",
+                                                "field": "fid",
                                                 "title": "Field ID"
                                             },
                                             {
                                                 "type": "quantitative",
-                                                "field": "completion",
+                                                "field": "c",
                                                 "title": "Field Completion"
                                             },
                                             {
                                                 "type": "quantitative",
-                                                "field": "priority",
+                                                "field": "p",
                                                 "title": "Field Priority"
                                             }
                                         ],
@@ -257,9 +376,18 @@
                                             "type": "temporal",
                                             "field": "Observation Start Time"
                                         },
-                                        "y": {"type": "quantitative", "field": "Altitude(°)"}
+                                        "y": {
+                                            "type": "quantitative",
+                                            "field": "Altitude(\u00b0)"
+                                        }
                                     },
-                                    "transform": [{"filter": {"selection": "selector001"}}]
+                                    "transform": [
+                                        {
+                                            "filter": {
+                                                "selection": "selector001"
+                                            }
+                                        }
+                                    ]
                                 },
                                 {
                                     "mark": {
@@ -275,10 +403,15 @@
                                             "type": "temporal",
                                             "field": "Observation Start Time"
                                         },
-                                        "y": {"type": "quantitative", "field": "Altitude(°)"}
+                                        "y": {
+                                            "type": "quantitative",
+                                            "field": "Altitude(\u00b0)"
+                                        }
                                     },
                                     "transform": [
-                                        {"filter": "datum.fieldStatus == \"Scheduled Now\""}
+                                        {
+                                            "filter": "datum.fS == \"Scheduled Now\""
+                                        }
                                     ]
                                 }
                             ],
@@ -288,37 +421,71 @@
                     ]
                 }
             ],
-            "data": {"name": "dataFields"}
+            "data": {
+                "name": "dataFields"
+            }
         },
         {
             "layer": [
                 {
-                    "data": {"sphere": true},
+                    "data": {
+                        "sphere": true
+                    },
                     "mark": {
                         "type": "geoshape",
                         "color": {
                             "gradient": "radial",
                             "stops": [
-                                {"color": "#07161f", "offset": 0},
-                                {"color": "#0e2836", "offset": 1}
+                                {
+                                    "color": "#07161f",
+                                    "offset": 0
+                                },
+                                {
+                                    "color": "#0e2836",
+                                    "offset": 1
+                                }
                             ]
                         }
                     }
                 },
                 {
-                    "data": {"graticule": true},
-                    "mark": {"type": "geoshape", "stroke": "#515151", "strokeWidth": 1}
+                    "data": {
+                        "graticule": true
+                    },
+                    "mark": {
+                        "type": "geoshape",
+                        "stroke": "#515151",
+                        "strokeWidth": 1
+                    }
                 },
                 {
-                    "data": {"name": "dataStars"},
-                    "mark": {"type": "point", "color": "#ffffff", "filled": true},
+                    "data": {
+                        "name": "dataStars"
+                    },
+                    "mark": {
+                        "type": "point",
+                        "color": "#ffffff",
+                        "filled": true
+                    },
                     "encoding": {
-                        "latitude": {"field": "Altitude(°)", "type": "quantitative"},
-                        "longitude": {"field": "az", "type": "quantitative"},
+                        "latitude": {
+                            "field": "Altitude(\u00b0)",
+                            "type": "quantitative"
+                        },
+                        "longitude": {
+                            "field": "az",
+                            "type": "quantitative"
+                        },
                         "size": {
                             "type": "quantitative",
                             "field": "Stellar Magnitude",
-                            "scale": {"range": [2, 50], "type": "pow"},
+                            "scale": {
+                                "range": [
+                                    2,
+                                    50
+                                ],
+                                "type": "pow"
+                            },
                             "sort": "descending"
                         }
                     },
@@ -328,41 +495,96 @@
                             "on": "mouseover",
                             "nearest": true,
                             "empty": "none",
-                            "fields": ["time_step_id"],
-                            "init": {"time_step_id": 0}
+                            "fields": [
+                                "tsid"
+                            ],
+                            "init": {
+                                "tsid": 0
+                            }
                         }
                     },
-                    "transform": [{"filter": {"selection": "selector001"}}]
+                    "transform": [
+                        {
+                            "filter": {
+                                "selection": "selector001"
+                            }
+                        }
+                    ]
                 },
                 {
                     "layer": [
                         {
-                            "mark": {"type": "text", "size": 26},
-                            "encoding": {
-                                "latitude": {"field": "moonAlt", "type": "quantitative"},
-                                "longitude": {"field": "moonAz", "type": "quantitative"},
-                                "text": {"type": "nominal", "field": "phase_icon"}
+                            "mark": {
+                                "type": "text",
+                                "size": 26
                             },
-                            "transform": [{"filter": {"selection": "selector001"}}]
+                            "encoding": {
+                                "latitude": {
+                                    "field": "mAlt",
+                                    "type": "quantitative"
+                                },
+                                "longitude": {
+                                    "field": "mAz",
+                                    "type": "quantitative"
+                                },
+                                "text": {
+                                    "type": "nominal",
+                                    "field": "phase"
+                                }
+                            },
+                            "transform": [
+                                {
+                                    "filter": {
+                                        "selection": "selector001"
+                                    }
+                                }
+                            ]
                         },
                         {
-                            "mark": {"type": "text", "dy": 12, "stroke": "white"},
+                            "mark": {
+                                "type": "text",
+                                "dy": 12,
+                                "stroke": "white"
+                            },
                             "encoding": {
-                                "latitude": {"field": "moonAlt", "type": "quantitative"},
-                                "longitude": {"field": "moonAz", "type": "quantitative"},
+                                "latitude": {
+                                    "field": "mAlt",
+                                    "type": "quantitative"
+                                },
+                                "longitude": {
+                                    "field": "mAz",
+                                    "type": "quantitative"
+                                },
                                 "opacity": {
-                                    "condition": {"value": 1, "selection": "selector005"},
+                                    "condition": {
+                                        "value": 1,
+                                        "selection": "selector005"
+                                    },
                                     "value": 0
                                 },
-                                "text": {"type": "nominal", "field": "fieldID"}
+                                "text": {
+                                    "type": "nominal",
+                                    "field": "fid"
+                                }
                             },
                             "selection": {
-                                "selector005": {"type": "single", "on": "mouseover"}
+                                "selector005": {
+                                    "type": "single",
+                                    "on": "mouseover"
+                                }
                             },
-                            "transform": [{"filter": {"selection": "selector001"}}]
+                            "transform": [
+                                {
+                                    "filter": {
+                                        "selection": "selector001"
+                                    }
+                                }
+                            ]
                         }
                     ],
-                    "data": {"name": "dataMoon"}
+                    "data": {
+                        "name": "dataMoon"
+                    }
                 },
                 {
                     "layer": [
@@ -377,38 +599,62 @@
                             "encoding": {
                                 "color": {
                                     "type": "nominal",
-                                    "field": "fieldStatus",
+                                    "field": "fS",
                                     "scale": {
-                                        "domain": ["Scheduled Now", "Available", "Unavailable"],
-                                        "range": ["yellow", "blue", "#6E7DDB"]
+                                        "domain": [
+                                            "Scheduled Now",
+                                            "Available",
+                                            "Unavailable"
+                                        ],
+                                        "range": [
+                                            "yellow",
+                                            "blue",
+                                            "#6E7DDB"
+                                        ]
                                     },
                                     "sort": "descending"
                                 },
-                                "latitude": {"field": "Altitude(°)", "type": "quantitative"},
-                                "longitude": {"field": "az", "type": "quantitative"},
+                                "latitude": {
+                                    "field": "Altitude(\u00b0)",
+                                    "type": "quantitative"
+                                },
+                                "longitude": {
+                                    "field": "az",
+                                    "type": "quantitative"
+                                },
                                 "opacity": {
-                                    "condition": {"value": 1, "test": "datum.Scheduled"},
+                                    "condition": {
+                                        "value": 1,
+                                        "test": "datum.Scheduled"
+                                    },
                                     "value": 0
                                 },
                                 "strokeOpacity": {
-                                    "condition": {"value": 1, "selection": "selector002"},
+                                    "condition": {
+                                        "value": 1,
+                                        "selection": "selector002"
+                                    },
                                     "value": 0
                                 },
                                 "tooltip": [
                                     {
                                         "type": "quantitative",
-                                        "field": "moonSep",
+                                        "field": "mS",
                                         "title": "Moon separation: "
                                     },
-                                    {"type": "nominal", "field": "fieldID", "title": "Field ID"},
+                                    {
+                                        "type": "nominal",
+                                        "field": "fid",
+                                        "title": "Field ID"
+                                    },
                                     {
                                         "type": "quantitative",
-                                        "field": "completion",
+                                        "field": "c",
                                         "title": "Field Completion"
                                     },
                                     {
                                         "type": "quantitative",
-                                        "field": "priority",
+                                        "field": "p",
                                         "title": "Field Priority"
                                     }
                                 ]
@@ -417,93 +663,162 @@
                                 "selector002": {
                                     "type": "multi",
                                     "on": "click",
-                                    "fields": ["fieldID"],
+                                    "fields": [
+                                        "fid"
+                                    ],
                                     "empty": "none"
                                 }
                             },
-                            "transform": [{"filter": {"selection": "selector001"}}]
+                            "transform": [
+                                {
+                                    "filter": {
+                                        "selection": "selector001"
+                                    }
+                                }
+                            ]
                         },
                         {
-                            "mark": {"type": "square", "opacity": 0.75, "size": 100},
+                            "mark": {
+                                "type": "square",
+                                "opacity": 0.75,
+                                "size": 100
+                            },
                             "encoding": {
                                 "color": {
                                     "type": "nominal",
-                                    "field": "fieldStatus",
+                                    "field": "fS",
                                     "scale": {
-                                        "domain": ["Scheduled Now", "Available", "Unavailable"],
-                                        "range": ["yellow", "blue", "#6E7DDB"]
+                                        "domain": [
+                                            "Scheduled Now",
+                                            "Available",
+                                            "Unavailable"
+                                        ],
+                                        "range": [
+                                            "yellow",
+                                            "blue",
+                                            "#6E7DDB"
+                                        ]
                                     },
                                     "sort": "descending"
                                 },
-                                "latitude": {"field": "Altitude(°)", "type": "quantitative"},
-                                "longitude": {"field": "az", "type": "quantitative"},
+                                "latitude": {
+                                    "field": "Altitude(\u00b0)",
+                                    "type": "quantitative"
+                                },
+                                "longitude": {
+                                    "field": "az",
+                                    "type": "quantitative"
+                                },
                                 "opacity": {
                                     "condition": {
                                         "value": 1,
-                                        "selection": {"and": ["selector003", "selector004"]}
+                                        "selection": {
+                                            "and": [
+                                                "selector003",
+                                                "selector004"
+                                            ]
+                                        }
                                     },
                                     "value": 0
                                 },
                                 "tooltip": [
                                     {
                                         "type": "quantitative",
-                                        "field": "moonSep",
+                                        "field": "mS",
                                         "title": "Moon separation: "
                                     },
-                                    {"type": "nominal", "field": "fieldID", "title": "Field ID"},
+                                    {
+                                        "type": "nominal",
+                                        "field": "fid",
+                                        "title": "Field ID"
+                                    },
                                     {
                                         "type": "quantitative",
-                                        "field": "completion",
+                                        "field": "c",
                                         "title": "Field Completion"
                                     },
                                     {
                                         "type": "quantitative",
-                                        "field": "priority",
+                                        "field": "p",
                                         "title": "Field Priority"
                                     }
                                 ]
                             },
                             "transform": [
-                                {"filter": {"selection": "selector001"}},
-                                {"filter": "! datum.Scheduled"}
+                                {
+                                    "filter": {
+                                        "selection": "selector001"
+                                    }
+                                },
+                                {
+                                    "filter": "! datum.Scheduled"
+                                }
                             ]
                         },
                         {
-                            "mark": {"type": "square", "opacity": 1, "size": 80},
+                            "mark": {
+                                "type": "square",
+                                "opacity": 1,
+                                "size": 80
+                            },
                             "encoding": {
                                 "color": {
                                     "type": "nominal",
-                                    "field": "fieldStatus",
+                                    "field": "fS",
                                     "scale": {
-                                        "domain": ["Scheduled Now", "Available", "Unavailable"],
-                                        "range": ["yellow", "blue", "#6E7DDB"]
+                                        "domain": [
+                                            "Scheduled Now",
+                                            "Available",
+                                            "Unavailable"
+                                        ],
+                                        "range": [
+                                            "yellow",
+                                            "blue",
+                                            "#6E7DDB"
+                                        ]
                                     },
                                     "sort": "descending"
                                 },
-                                "latitude": {"field": "Altitude(°)", "type": "quantitative"},
-                                "longitude": {"field": "az", "type": "quantitative"},
+                                "latitude": {
+                                    "field": "Altitude(\u00b0)",
+                                    "type": "quantitative"
+                                },
+                                "longitude": {
+                                    "field": "az",
+                                    "type": "quantitative"
+                                },
                                 "tooltip": [
                                     {
                                         "type": "quantitative",
-                                        "field": "moonSep",
+                                        "field": "mS",
                                         "title": "Moon separation: "
                                     },
-                                    {"type": "nominal", "field": "fieldID", "title": "Field ID"},
+                                    {
+                                        "type": "nominal",
+                                        "field": "fid",
+                                        "title": "Field ID"
+                                    },
                                     {
                                         "type": "quantitative",
-                                        "field": "completion",
+                                        "field": "c",
                                         "title": "Field Completion"
                                     },
                                     {
                                         "type": "quantitative",
-                                        "field": "priority",
+                                        "field": "p",
                                         "title": "Field Priority"
                                     }
                                 ]
                             },
                             "transform": [
-                                {"filter": {"selection": "selector001"}},
-                                {"filter": "datum.fieldStatus == \"Scheduled Now\""}
+                                {
+                                    "filter": {
+                                        "selection": "selector001"
+                                    }
+                                },
+                                {
+                                    "filter": "datum.fS == \"Scheduled Now\""
+                                }
                             ]
                         },
                         {
@@ -516,50 +831,92 @@
                                 "strokeWidth": 0
                             },
                             "encoding": {
-                                "latitude": {"field": "Altitude(°)", "type": "quantitative"},
-                                "longitude": {"field": "az", "type": "quantitative"}
+                                "latitude": {
+                                    "field": "Altitude(\u00b0)",
+                                    "type": "quantitative"
+                                },
+                                "longitude": {
+                                    "field": "az",
+                                    "type": "quantitative"
+                                }
                             },
                             "transform": [
-                                {"filter": {"selection": "selector001"}},
-                                {"filter": "datum.Scheduled"}
+                                {
+                                    "filter": {
+                                        "selection": "selector001"
+                                    }
+                                },
+                                {
+                                    "filter": "datum.Scheduled"
+                                }
                             ]
                         },
                         {
-                            "mark": {"type": "square", "fillOpacity": 0, "stroke": "orange"},
+                            "mark": {
+                                "type": "square",
+                                "fillOpacity": 0,
+                                "stroke": "orange"
+                            },
                             "encoding": {
-                                "latitude": {"field": "Altitude(°)", "type": "quantitative"},
-                                "longitude": {"field": "az", "type": "quantitative"},
+                                "latitude": {
+                                    "field": "Altitude(\u00b0)",
+                                    "type": "quantitative"
+                                },
+                                "longitude": {
+                                    "field": "az",
+                                    "type": "quantitative"
+                                },
                                 "opacity": {
                                     "condition": {
                                         "value": 1,
-                                        "selection": {"and": ["selector003", "selector004"]}
+                                        "selection": {
+                                            "and": [
+                                                "selector003",
+                                                "selector004"
+                                            ]
+                                        }
                                     },
                                     "value": 0
                                 },
-                                "strokeWidth": {"type": "quantitative", "field": "completion"},
+                                "strokeWidth": {
+                                    "type": "quantitative",
+                                    "field": "c"
+                                },
                                 "tooltip": [
                                     {
                                         "type": "quantitative",
-                                        "field": "moonSep",
+                                        "field": "mS",
                                         "title": "Moon separation: "
                                     },
-                                    {"type": "nominal", "field": "fieldID", "title": "Field ID"},
+                                    {
+                                        "type": "nominal",
+                                        "field": "fid",
+                                        "title": "Field ID"
+                                    },
                                     {
                                         "type": "quantitative",
-                                        "field": "completion",
+                                        "field": "c",
                                         "title": "Field Completion"
                                     },
                                     {
                                         "type": "quantitative",
-                                        "field": "priority",
+                                        "field": "p",
                                         "title": "Field Priority"
                                     }
                                 ]
                             },
                             "transform": [
-                                {"filter": {"selection": "selector001"}},
-                                {"filter": "datum.fieldStatus == \"Available\""},
-                                {"filter": "! datum.Scheduled"}
+                                {
+                                    "filter": {
+                                        "selection": "selector001"
+                                    }
+                                },
+                                {
+                                    "filter": "datum.fS == \"Available\""
+                                },
+                                {
+                                    "filter": "! datum.Scheduled"
+                                }
                             ]
                         },
                         {
@@ -571,46 +928,96 @@
                                 "size": 90
                             },
                             "encoding": {
-                                "latitude": {"field": "Altitude(°)", "type": "quantitative"},
-                                "longitude": {"field": "az", "type": "quantitative"}
+                                "latitude": {
+                                    "field": "Altitude(\u00b0)",
+                                    "type": "quantitative"
+                                },
+                                "longitude": {
+                                    "field": "az",
+                                    "type": "quantitative"
+                                }
                             },
                             "transform": [
-                                {"filter": {"selection": "selector001"}},
-                                {"filter": {"selection": "selector002"}}
+                                {
+                                    "filter": {
+                                        "selection": "selector001"
+                                    }
+                                },
+                                {
+                                    "filter": {
+                                        "selection": "selector002"
+                                    }
+                                }
                             ]
                         }
                     ],
-                    "data": {"name": "dataFields"}
-                },
-                {
-                    "data": {"name": "data-70085b541ccabc997242a1396e894881"},
-                    "mark": {"type": "text", "color": "#C0C0C0", "fontSize": 16},
-                    "encoding": {
-                        "latitude": {"field": "lat", "type": "quantitative"},
-                        "longitude": {"field": "long", "type": "quantitative"},
-                        "text": {"type": "nominal", "field": "text"}
+                    "data": {
+                        "name": "dataFields"
                     }
                 },
                 {
-                    "data": {"name": "data-e496e7a90d81bd55bb377ba76f74fb35"},
-                    "mark": {"type": "text", "color": "white"},
+                    "data": {
+                        "name": "data-70085b541ccabc997242a1396e894881"
+                    },
+                    "mark": {
+                        "type": "text",
+                        "color": "#C0C0C0",
+                        "fontSize": 16
+                    },
                     "encoding": {
-                        "latitude": {"field": "lat", "type": "quantitative"},
-                        "longitude": {"field": "long", "type": "quantitative"},
-                        "text": {"type": "nominal", "field": "text"}
+                        "latitude": {
+                            "field": "lat",
+                            "type": "quantitative"
+                        },
+                        "longitude": {
+                            "field": "long",
+                            "type": "quantitative"
+                        },
+                        "text": {
+                            "type": "nominal",
+                            "field": "text"
+                        }
+                    }
+                },
+                {
+                    "data": {
+                        "name": "data-e496e7a90d81bd55bb377ba76f74fb35"
+                    },
+                    "mark": {
+                        "type": "text",
+                        "color": "white"
+                    },
+                    "encoding": {
+                        "latitude": {
+                            "field": "lat",
+                            "type": "quantitative"
+                        },
+                        "longitude": {
+                            "field": "long",
+                            "type": "quantitative"
+                        },
+                        "text": {
+                            "type": "nominal",
+                            "field": "text"
+                        }
                     }
                 }
             ],
             "height": 800,
             "projection": {
                 "clipAngle": 90,
-                "rotate": [0, -90, 180],
+                "rotate": [
+                    0,
+                    -90,
+                    180
+                ],
                 "type": "azimuthalEquidistant"
             },
             "width": 800
         }
     ],
-    "$schema": "https://vega.github.io/schema/vega-lite/v4.8.1.json",  "datasets": {
+    "$schema": "https://vega.github.io/schema/vega-lite/v4.8.1.json",
+    "datasets": {
         "dataFields": [],
         "dataStars": [],
         "dataMoon": [],
@@ -640,37 +1047,37 @@
             {
                 "lat": 2,
                 "long": 0,
-                "text": "0°"
+                "text": "0\u00b0"
             },
             {
                 "lat": 30,
                 "long": 0,
-                "text": "30°"
+                "text": "30\u00b0"
             },
             {
                 "lat": 60,
                 "long": 0,
-                "text": "60°"
+                "text": "60\u00b0"
             },
             {
                 "lat": 90,
                 "long": 0,
-                "text": "90°"
+                "text": "90\u00b0"
             },
             {
                 "lat": 60,
                 "long": 180,
-                "text": "60°"
+                "text": "60\u00b0"
             },
             {
                 "lat": 30,
                 "long": 180,
-                "text": "30°"
+                "text": "30\u00b0"
             },
             {
                 "lat": 2,
                 "long": 180,
-                "text": "0°"
+                "text": "0\u00b0"
             }
         ]
     }

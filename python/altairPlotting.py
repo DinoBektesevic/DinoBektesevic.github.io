@@ -504,6 +504,10 @@ if __name__ == "__main__":
         #   symbolSize=150
         #)
 
+        saveName = "altair_with_moon_final"
         # Save as html
         # chart.save(f"../data/viz_jsons/altair_{mjd}.html")
-        chart.save(f"altair_with_moon_final.html")
+        #chart.save(f"{saveName}.html")
+
+        # Save as JSON
+        chart.save(f"{saveName}.json")
