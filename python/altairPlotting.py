@@ -2,6 +2,7 @@ import pandas as pd
 import altair as alt
 import numpy as np
 
+
 def get_data(data, moon_data=True):
     '''
     Takes the sdss field data, rounds floats, subsets to only observed fields, and calculates utcs times.
@@ -9,6 +10,11 @@ def get_data(data, moon_data=True):
     field_cols = ['Altitude(°)', 'az', 'moonSep', 'fieldID', 'objType', 'fieldStatus', 'Observation Start Time', 'time_step_id', 'priority', 'completion', 'Scheduled']
     star_cols = ['Altitude(°)', 'az', 'time_step_id', 'Stellar Magnitude']
     moon_cols = ['moonAlt', 'moonAz', 'time_step_id', 'fieldID', 'phase_icon']
+
+    renamed_field_cols = ['Altitude(°)', 'az', 'mS', 'fid', 'oT', 'fS', 'Observation Start Time', 'tsid', 'p', 'c', 'Scheduled']
+    renamed_star_cols = ['Altitude(°)', 'az', 'tsid', 'Stellar Magnitude']
+    renamed_moon_cols = ['mAlt', 'mAz', 'tsid', 'fid', 'phase']
+
     # round columms
     for col in data.dtypes[data.dtypes == 'float64'].index:
         data[col] = round(data[col], 6)
@@ -46,6 +52,8 @@ def get_data(data, moon_data=True):
     stars['Altitude(°)'] = stars['alt']
 
     # Get moon data
+    fields.rename(columns={old:new for old, new in zip(field_cols, renamed_field_cols)}, inplace=True)
+    stars.rename(columns={old:new for old, new in zip(star_cols, renamed_star_cols)}, inplace=True)
     if moon_data:
         moon = fields[['mjdExpStart', 'moonAz', 'moonAlt', 'moonPhase']].drop_duplicates()
         moon = moon.loc[moon['moonAlt'] > -.5]
@@ -67,43 +75,45 @@ def get_data(data, moon_data=True):
 
         moon['phase_icon'] = [phase_icon[0] for i in range(len(moon))]
 
-        return fields[field_cols], stars[star_cols], moon[moon_cols]
+        moon.rename(columns={old:new for old, new in zip(moon_cols, renamed_moon_cols)}, inplace=True)
+        return fields[renamed_field_cols], stars[renamed_star_cols], moon[renamed_moon_cols]
 
     return fields, stars
+
 
 
 def make_viz(field_data, star_data, moon_data, select_field, select_time, field_scale):
     '''
     Create the sky mapping part of the visualization, with fields, stars, and the moon.
     '''
-    select_completion = alt.selection_interval(init={'completion': [60, 100]})
-    select_priority = alt.selection_interval(init={'priority': [3, 5]})
+    select_c = alt.selection_interval(init={'c': [60, 100]})
+    select_p = alt.selection_interval(init={'p': [3, 5]})
 
-    def make_priority_interact(field_data, priority_selection, height=50, width=300):
+    def make_p_interact(field_data, p_selection, height=50, width=300):
         '''histogram of priorities that is brush-linked the plots'''
         pri = alt.Chart(field_data).mark_bar().encode(
-            x=alt.X('priority:O', title='Field Priority'),
+            x=alt.X('p:O', title='Field Priority'),
             y=alt.Y('count()', title='# of Fields')
         ).add_selection(
-            priority_selection
+            p_selection
         ).properties(
             height=height,
             width=width)
         return pri
 
-    def make_completion_interact(field_data, completion_selection, height=50, width=300):
+    def make_c_interact(field_data, c_selection, height=50, width=300):
         '''legend that is also brush-linked to the plots'''
         comp = alt.layer(
             alt.Chart(data).mark_square(size=150, fill="blue").encode(
-                x=alt.X('completion', bin=alt.Bin(extent=[0, 100], step=10), title="Field Completion")
+                x=alt.X('c', bin=alt.Bin(extent=[0, 100], step=10), title="Field Completion")
             ),
 
             alt.Chart(data).mark_square(size=60, fillOpacity=0, stroke="orange").encode(
-                x=alt.X('completion', bin=alt.Bin(extent=[0, 100], step=10), title="Field Completion"),
-                strokeWidth=alt.Size('max(completion)', legend=None, bin=alt.Bin(extent=[0, 100], step=20))
+                x=alt.X('c', bin=alt.Bin(extent=[0, 100], step=10), title="Field Completion"),
+                strokeWidth=alt.Size('max(c)', legend=None, bin=alt.Bin(extent=[0, 100], step=20))
             )
         ).add_selection(
-            completion_selection
+            c_selection
         ).properties(
             height=height,
             width=width)
@@ -118,14 +128,14 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
         base = alt.Chart().mark_point().encode(
             x='Observation Start Time:T',
             y=alt.Y('Altitude(°):Q', scale=alt.Scale(domain=(0,90))),
-            color=alt.Color('fieldStatus:N', sort='descending', scale=field_scale, legend=alt.Legend(title="Field Status")),
-            # color=alt.Color('fieldStatus:N', sort='descending', scale=field_scale), # cs remove legend
+            color=alt.Color('fS:N', sort='descending', scale=field_scale, legend=alt.Legend(title="Field Status")),
+            # color=alt.Color('fS:N', sort='descending', scale=field_scale), # cs remove legend
             # opacity=alt.condition(select_field, alt.value(1), alt.value(0.21))
             opacity=alt.condition(select_field, alt.value(1), alt.value(0))
         ).add_selection(
             select_time
         ).transform_filter(
-            'datum.fieldStatus != "Scheduled Now"'
+            'datum.fS != "Scheduled Now"'
         ).transform_filter(
             {'or': ['datum.Scheduled', select_field]}
         ).add_selection(
@@ -136,11 +146,11 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
         observing_field_alts1 = alt.Chart().mark_point(filled=True).encode(
             x='Observation Start Time:T',
             y='Altitude(°):Q',
-            color=alt.Color('fieldStatus:N', sort='descending', scale=field_scale, legend=alt.Legend(title='Field Status')),
+            color=alt.Color('fS:N', sort='descending', scale=field_scale, legend=alt.Legend(title='Field Status')),
             opacity=alt.condition(select_field, alt.value(1), alt.value(0.55)),
             size=alt.condition(select_field, alt.value(200), alt.value(200))
         ).transform_filter(
-            'datum.fieldStatus == "Scheduled Now"'
+            'datum.fS == "Scheduled Now"'
         ).add_selection(
             select_field
         )
@@ -149,13 +159,13 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
         observing_field_alts = alt.Chart(field_data).mark_square(opacity=0.25, size=30, stroke='red', strokeWidth=2).encode(
             x='Observation Start Time:T',
             y='Altitude(°):Q',
-            color=alt.Color('fieldStatus', sort='descending', scale=field_scale),
+            color=alt.Color('fS', sort='descending', scale=field_scale),
             tooltip=[
-                alt.Tooltip('moonSep', title="Moon separation: "),
-                alt.Tooltip('fieldID', title="Field ID"),
-                alt.Tooltip('completion', title="Field Completion"),
-                alt.Tooltip("priority", title="Field Priority")],
-            opacity=alt.condition(select_completion & select_priority , alt.value(1), alt.value(0)),
+                alt.Tooltip('mS', title="Moon separation: "),
+                alt.Tooltip('fid', title="Field ID"),
+                alt.Tooltip('c', title="Field Completion"),
+                alt.Tooltip("p", title="Field Priority")],
+            opacity=alt.condition(select_c & select_p , alt.value(1), alt.value(0)),
             strokeOpacity=alt.condition(select_field, alt.value(1), alt.value(0))
         ).transform_filter(
             select_time
@@ -165,7 +175,7 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
             x='Observation Start Time:T',
             y='Altitude(°):Q',
         ).transform_filter(
-            'datum.fieldStatus == "Scheduled Now"'
+            'datum.fS == "Scheduled Now"'
         )
 
         # layer all altitude plot elements together
@@ -185,8 +195,8 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
 
         return alts
 
-    completion_legend = make_completion_interact(field_data, select_completion)
-    priority_legend = make_priority_interact(field_data, select_priority)
+    c_legend = make_c_interact(field_data, select_c)
+    p_legend = make_p_interact(field_data, select_p)
 
     # NSEW labels
     directions = pd.DataFrame({"lat": [-3, -3, -3, -3], "long": [0, 90, 180, 270], "text": ["N", "E", "S", "W"]})
@@ -203,9 +213,9 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
         text="text")
 
     moon_base = alt.Chart().mark_text(size=26).encode(
-        latitude='moonAlt',
-        longitude='moonAz',
-        text='phase_icon'
+        latitude='mAlt',
+        longitude='mAz',
+        text='phase'
     ).transform_filter(
         select_time
     )
@@ -213,9 +223,9 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
     # Mouseover label
     moon_selection = alt.selection_single(on='mouseover')
     moon_text = alt.Chart().mark_text(stroke='white', dy=12).encode(
-        latitude='moonAlt',
-        longitude='moonAz',
-        text='fieldID',
+        latitude='mAlt',
+        longitude='mAz',
+        text='fid',
         opacity=alt.condition(moon_selection, alt.value(1), alt.value(0))
     ).transform_filter(
         select_time
@@ -246,13 +256,13 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
     fields_not_scheduled = alt.Chart(field_data).mark_square(opacity=0.75, size=100).encode(
         latitude='Altitude(°)',
         longitude='az',
-        color=alt.Color('fieldStatus', sort='descending', scale=field_scale),
+        color=alt.Color('fS', sort='descending', scale=field_scale),
         tooltip=[
-            alt.Tooltip('moonSep', title="Moon separation: "),
-            alt.Tooltip('fieldID', title="Field ID"),
-            alt.Tooltip('completion', title="Field Completion"),
-            alt.Tooltip("priority", title="Field Priority")],
-        opacity=alt.condition(select_completion & select_priority , alt.value(1), alt.value(0))
+            alt.Tooltip('mS', title="Moon separation: "),
+            alt.Tooltip('fid', title="Field ID"),
+            alt.Tooltip('c', title="Field Completion"),
+            alt.Tooltip("p", title="Field Priority")],
+        opacity=alt.condition(select_c & select_p , alt.value(1), alt.value(0))
     ).transform_filter(
         select_time
     ).transform_filter(
@@ -263,12 +273,12 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
     fields_scheduled = alt.Chart(field_data).mark_square(opacity=0.75, size=100, stroke='red', strokeWidth=2).encode(
         latitude='Altitude(°)',
         longitude='az',
-        color=alt.Color('fieldStatus', sort='descending', scale=field_scale),
+        color=alt.Color('fS', sort='descending', scale=field_scale),
         tooltip=[
-            alt.Tooltip('moonSep', title="Moon separation: "),
-            alt.Tooltip('fieldID', title="Field ID"),
-            alt.Tooltip('completion', title="Field Completion"),
-            alt.Tooltip("priority", title="Field Priority")],
+            alt.Tooltip('mS', title="Moon separation: "),
+            alt.Tooltip('fid', title="Field ID"),
+            alt.Tooltip('c', title="Field Completion"),
+            alt.Tooltip("p", title="Field Priority")],
         opacity=alt.condition('datum.Scheduled', alt.value(1), alt.value(0)),
         strokeOpacity=alt.condition(select_field, alt.value(1), alt.value(0))
     ).transform_filter(
@@ -287,21 +297,21 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
         'datum.Scheduled'
     )
 
-    # Plot completion
-    completion = alt.Chart(field_data).mark_square(stroke='orange', fillOpacity=0).encode(
+    # Plot c
+    c = alt.Chart(field_data).mark_square(stroke='orange', fillOpacity=0).encode(
         latitude='Altitude(°)',
         longitude='az',
         tooltip=[
-            alt.Tooltip('moonSep', title="Moon separation: "),
-            alt.Tooltip('fieldID', title="Field ID"),
-            alt.Tooltip('completion', title="Field Completion"),
-            alt.Tooltip("priority", title="Field Priority")],
-        strokeWidth=alt.Size('completion'),    # thickness of stroke indicates completion
-        opacity=alt.condition(select_completion & select_priority , alt.value(1), alt.value(0))
+            alt.Tooltip('mS', title="Moon separation: "),
+            alt.Tooltip('fid', title="Field ID"),
+            alt.Tooltip('c', title="Field Completion"),
+            alt.Tooltip("p", title="Field Priority")],
+        strokeWidth=alt.Size('c'),    # thickness of stroke indicates c
+        opacity=alt.condition(select_c & select_p , alt.value(1), alt.value(0))
     ).transform_filter(
         select_time
     ).transform_filter(
-        'datum.fieldStatus == "Available"'    # Only plot for available fields
+        'datum.fS == "Available"'    # Only plot for available fields
     ).transform_filter(
         '! datum.Scheduled')    # Don't plot of fields already scheduled
 
@@ -309,16 +319,16 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
     field_scheduled_now = alt.Chart(field_data).mark_square(opacity=1, size=80).encode(
         latitude='Altitude(°)',
         longitude='az',
-        color=alt.Color('fieldStatus', sort='descending', scale=field_scale),
+        color=alt.Color('fS', sort='descending', scale=field_scale),
         tooltip=[
-            alt.Tooltip('moonSep', title="Moon separation: "),
-            alt.Tooltip('fieldID', title="Field ID"),
-            alt.Tooltip('completion', title="Field Completion"),
-            alt.Tooltip("priority", title="Field Priority")],
+            alt.Tooltip('mS', title="Moon separation: "),
+            alt.Tooltip('fid', title="Field ID"),
+            alt.Tooltip('c', title="Field Completion"),
+            alt.Tooltip("p", title="Field Priority")],
     ).transform_filter(
         select_time
     ).transform_filter(
-        'datum.fieldStatus == "Scheduled Now"'
+        'datum.fS == "Scheduled Now"'
     )
 
     # Add red border to selected fields
@@ -340,8 +350,8 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
         field_scheduled_now,
         # + for scheduled fields
         scheduled_fields_mark,
-        # plot completion
-        completion,
+        # plot c
+        c,
         # field selection borders
         selected_field,
     ).add_selection(
@@ -355,20 +365,20 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
 
     # add text to display field Scheduled Now
     field_text = alt.Chart(field_data).mark_text(align='left', dx=50, dy=0, baseline='bottom', fontSize=25, color="#C0C0C0", fontWeight=500).encode(
-        text='fieldID'
+        text='fid'
     ).transform_calculate(
-        fieldID = '"Scheduled fieldID: " + datum.fieldID'
+        fid = '"Scheduled fid: " + datum.fid'
     ).transform_filter(
         select_time
     ).transform_filter(
-        'datum.fieldStatus == "Scheduled Now"'
+        'datum.fS == "Scheduled Now"'
     )
 
     # Make altitude plot
     alts = make_alts_plot(data, select_field, select_time, field_scale)
 
     # Create sky map visualization
-    sky_map = ((time | field_text) & ((completion_legend | priority_legend) & alts)) | alt.layer(    # LAYOUT HERE priority and completion elements
+    sky_map = ((time | field_text) & ((c_legend | p_legend) & alts)) | alt.layer(    # LAYOUT HERE p and c elements
         # use the sphere of the Earth as the base layer
         alt.Chart({'sphere': True}).mark_geoshape(
             color=alt.RadialGradient(
@@ -414,22 +424,22 @@ def get_interactive_elements():
         on='mouseover',  # select on mouseover events
         nearest=True,    # select data point nearest the cursor
         empty='none',     # empty selection includes no data points
-        fields=['time_step_id'],
-        init={'time_step_id': 0}
+        fields=['tsid'],
+        init={'tsid': 0}
     )
 
     # Interaction on fields
     # https://github.com/vega/vega-lite/issues/5553 - jeez
-    select_field = alt.selection_multi(on='click', fields=['fieldID'], empty='none')
+    select_field = alt.selection_multi(on='click', fields=['fid'], empty='none')
 
     # Set up color scheme for field status
     field_scale = alt.Scale(domain=('Scheduled Now', 'Available', 'Unavailable'),
                             # range=["#ffda60", '#a7b7bf', '#a7b7bf', '#506e7f'])
                             range=["yellow", "blue", "#6E7DDB"])
 
-#     select_completion = alt.selection_interval(init={'completion': [60, 100]})
-#     select_priority = alt.selection_interval(init={'priority': [0, 5]})
-    return select_field, select_time, field_scale # , select_completion, select_priority
+#     select_c = alt.selection_interval(init={'c': [60, 100]})
+#     select_p = alt.selection_interval(init={'p': [0, 5]})
+    return select_field, select_time, field_scale # , select_c, select_p
 
 
 if __name__ == "__main__":
@@ -438,7 +448,7 @@ if __name__ == "__main__":
     for mjd in range(59390, 59391):
         print(mjd)
         # Read data and preprocess
-        # df = pd.read_csv(f'../data/full_data/mjd-{mjd}-sdss-simple-expanded-priority.csv', index_col=0)
+        # df = pd.read_csv(f'../data/full_data/mjd-{mjd}-sdss-simple-expanded-p.csv', index_col=0)
         df = pd.read_csv('mjd-59305-sdss-simple-expanded-priority.csv', index_col=0)
 
         data, star_data, moon_pos = get_data(df, moon_data=True)

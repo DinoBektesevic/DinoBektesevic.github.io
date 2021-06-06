@@ -28,8 +28,3 @@ if __name__ == "__main__":
         for name, datum in zip(("fields.json", "stars.json",  "moon.json"), data):
             outPath = os.path.join(save_path, name)
             datum.to_json(outPath, orient='records', double_precision=2, date_unit="s")
-
-
-#    field_cols = ['Altitude(°)', 'az', 'moonSep', 'fieldID', 'objType', 'fieldStatus', 'Observation Start Time', 'time_step_id', 'priority', 'completion', 'Scheduled']
-#    star_cols = ['Altitude(°)', 'az', 'time_step_id', 'Stellar Magnitude']
-#    moon_cols = ['moonAlt', 'moonAz', 'time_step_id', 'fieldID', 'phase_icon']
