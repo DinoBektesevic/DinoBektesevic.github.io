@@ -8,11 +8,11 @@ def get_data(data, moon_data=True):
     Takes the sdss field data, rounds floats, subsets to only observed fields, and calculates utcs times.
     '''
     field_cols = ['alt', 'az', 'moonSep', 'fieldID', 'fieldStatus', 'Observation Start Time', 'time_step_id', 'priority', 'completion', 'Scheduled']
-    star_cols = ['alt', 'az', 'time_step_id', 'Stellar Magnitude']
+    star_cols = ['alt', 'az', 'time_step_id', 'mag']
     moon_cols = ['moonAlt', 'moonAz', 'time_step_id', 'phase_icon']
 
     renamed_field_cols = ['alt', 'az', 'mS', 'fid', 'fS', 'st', 'tsid', 'p', 'c', 'sch']
-    renamed_star_cols = ['alt', 'az', 'tsid', 'Stellar Magnitude']
+    renamed_star_cols = ['alt', 'az', 'tsid', 'mag']
     renamed_moon_cols = ['mAlt', 'mAz', 'tsid', 'phase']
 
     # round columms
@@ -48,7 +48,7 @@ def get_data(data, moon_data=True):
 
     # Round mangitudes to nearest 0.5
     stars = stars.query('magnitude < 4.5')
-    stars['Stellar Magnitude'] = round(stars['magnitude'], 0)
+    stars['mag'] = round(stars['magnitude'], 0)
     # stars['Altitude(°)'] = stars['alt']
 
     # Get moon data
@@ -293,7 +293,7 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
     ).encode(
         latitude='alt',
         longitude='az',
-        size=alt.Size('Stellar Magnitude', sort='descending', scale=alt.Scale(type='pow', range=(2,50)))
+        size=alt.Size('mag', sort='descending', scale=alt.Scale(type='pow', range=(2,50)), legend=alt.Legend(title="Stellar Magnitude"))
     ).add_selection(
         select_time
     ).transform_filter(
@@ -475,7 +475,7 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
     alts = make_alts_plot(data, select_field, select_time, select_c, select_p, field_scale)
 
     # Create sky map visualization
-    sky_map = ((time | field_text) & ((c_legend | p_legend) & alts)) | alt.layer(    # LAYOUT HERE p and c elements
+    sky_map = ((time | field_text) & ((c_legend | p_legend) & alts)) | alt.layer(  # LAYOUT HERE priority and completion elements
         # use the sphere of the Earth as the base layer
         alt.Chart({'sphere': True}).mark_geoshape(
             color=alt.RadialGradient(
@@ -498,7 +498,6 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
         dir_labels,
         # altitude lables
         alt_labels,
-        # title="Sky with SDSS fields, looking up while facing south" # cs remove title
     ).properties(
         width=800,
         height=800,
