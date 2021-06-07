@@ -23,7 +23,6 @@ def get_data(data, moon_data=True):
     scheduled = data.loc[data['scheduled']==True]
     scheduled.sort_values('mjdExpStart', inplace=True)
 
-    # fields = data[data['fieldID'].isin(scheduled['fieldID'])]
     fields = data.query('objType == "sdss field"')
     fields['Observation Start Time'] = pd.to_datetime(fields['mjdExpStart'] + 2400000.5, unit='D', origin='julian') - pd.Timedelta(hours=6)
     fields = fields.loc[fields['alt'] > -.5] # could change to use 'Risen'
@@ -39,8 +38,6 @@ def get_data(data, moon_data=True):
     fields['Scheduled'] = False
     fields.loc[fields['fieldID'].isin(scheduled['fieldID']), 'Scheduled'] = True
 
-    # fields['Altitude(°)'] = fields['alt']
-
     # Assign observation numbers as time step id
     ts = {mjd: ii for ii, mjd in enumerate(fields['mjdExpStart'].sort_values().unique())}
     fields['time_step_id'] = [ts[mjd] for mjd in fields['mjdExpStart']]
@@ -49,13 +46,12 @@ def get_data(data, moon_data=True):
     # Round mangitudes to nearest 0.5
     stars = stars.query('magnitude < 4.5')
     stars['mag'] = round(stars['magnitude'], 0)
-    # stars['Altitude(°)'] = stars['alt']
 
     # Get moon data
     fields.rename(columns={old:new for old, new in zip(field_cols, renamed_field_cols)}, inplace=True)
     stars.rename(columns={old:new for old, new in zip(star_cols, renamed_star_cols)}, inplace=True)
 
-        # round columms
+    # round columms
     for col in data.dtypes[data.dtypes == 'float64'].index:
         data[col] = round(data[col], )
         data['moonSep'] = round(data['moonSep'], 1)
