@@ -7,13 +7,13 @@ def get_data(data, moon_data=True):
     '''
     Takes the sdss field data, rounds floats, subsets to only observed fields, and calculates utcs times.
     '''
-    field_cols = ['Altitude(°)', 'az', 'moonSep', 'fieldID', 'objType', 'fieldStatus', 'Observation Start Time', 'time_step_id', 'priority', 'completion', 'Scheduled']
-    star_cols = ['Altitude(°)', 'az', 'time_step_id', 'Stellar Magnitude']
-    moon_cols = ['moonAlt', 'moonAz', 'time_step_id', 'fieldID', 'phase_icon']
+    field_cols = ['alt', 'az', 'moonSep', 'fieldID', 'fieldStatus', 'Observation Start Time', 'time_step_id', 'priority', 'completion', 'Scheduled']
+    star_cols = ['alt', 'az', 'time_step_id', 'Stellar Magnitude']
+    moon_cols = ['moonAlt', 'moonAz', 'time_step_id', 'phase_icon']
 
-    renamed_field_cols = ['Altitude(°)', 'az', 'mS', 'fid', 'oT', 'fS', 'Observation Start Time', 'tsid', 'p', 'c', 'Scheduled']
-    renamed_star_cols = ['Altitude(°)', 'az', 'tsid', 'Stellar Magnitude']
-    renamed_moon_cols = ['mAlt', 'mAz', 'tsid', 'fid', 'phase']
+    renamed_field_cols = ['alt', 'az', 'mS', 'fid', 'fS', 'st', 'tsid', 'p', 'c', 'sch']
+    renamed_star_cols = ['alt', 'az', 'tsid', 'Stellar Magnitude']
+    renamed_moon_cols = ['mAlt', 'mAz', 'tsid', 'phase']
 
     # round columms
     for col in data.dtypes[data.dtypes == 'float64'].index:
@@ -39,7 +39,7 @@ def get_data(data, moon_data=True):
     fields['Scheduled'] = False
     fields.loc[fields['fieldID'].isin(scheduled['fieldID']), 'Scheduled'] = True
 
-    fields['Altitude(°)'] = fields['alt']
+    # fields['Altitude(°)'] = fields['alt']
 
     # Assign observation numbers as time step id
     ts = {mjd: ii for ii, mjd in enumerate(fields['mjdExpStart'].sort_values().unique())}
@@ -49,30 +49,35 @@ def get_data(data, moon_data=True):
     # Round mangitudes to nearest 0.5
     stars = stars.query('magnitude < 4.5')
     stars['Stellar Magnitude'] = round(stars['magnitude'], 0)
-    stars['Altitude(°)'] = stars['alt']
+    # stars['Altitude(°)'] = stars['alt']
 
     # Get moon data
     fields.rename(columns={old:new for old, new in zip(field_cols, renamed_field_cols)}, inplace=True)
     stars.rename(columns={old:new for old, new in zip(star_cols, renamed_star_cols)}, inplace=True)
+                 
+        # round columms
+    for col in data.dtypes[data.dtypes == 'float64'].index:
+        data[col] = round(data[col], )
+        data['moonSep'] = round(data['moonSep'], 1)
+                 
     if moon_data:
         moon = fields[['mjdExpStart', 'moonAz', 'moonAlt', 'moonPhase']].drop_duplicates()
         moon = moon.loc[moon['moonAlt'] > -.5]
         moon['time_step_id'] = [ts[mjd] for mjd in moon['mjdExpStart']]
-        moon['fieldID'] = 'moon'
 
         avg_moon_phase = np.nanmean(moon['moonPhase'])
         phase_dict = {'🌑': [0,.1],
                       '🌒': [.1,.3],
                       '🌓': [.3,.7],
                       '🌔': [.7,.9],
-                      '🌕': [.9,1]}
+                      '🌕': [.9,1.01]}
         phase_icon = []
         for i in range(len(phase_dict)):
             rng  = list(phase_dict.values())[i]
             char = list(phase_dict.keys())[i]
             if rng[0] <= avg_moon_phase < rng[1]:
                 phase_icon.append(char)
-
+        
         moon['phase_icon'] = [phase_icon[0] for i in range(len(moon))]
 
         moon.rename(columns={old:new for old, new in zip(moon_cols, renamed_moon_cols)}, inplace=True)
@@ -126,8 +131,8 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
 
         # Plot time against altitude
         base = alt.Chart().mark_point().encode(
-            x='Observation Start Time:T',
-            y=alt.Y('Altitude(°):Q', scale=alt.Scale(domain=(0,90))),
+            x=alt.X('st:T', title='Local Time'),
+            y=alt.Y('alt:Q', scale=alt.Scale(domain=(0,90)), title='Altitude(°)'),
             color=alt.Color('fS:N', sort='descending', scale=field_scale, legend=alt.Legend(title="Field Status")),
             # color=alt.Color('fS:N', sort='descending', scale=field_scale), # cs remove legend
             # opacity=alt.condition(select_field, alt.value(1), alt.value(0.21))
@@ -137,15 +142,15 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
         ).transform_filter(
             'datum.fS != "Scheduled Now"'
         ).transform_filter(
-            {'or': ['datum.Scheduled', select_field]}
+            {'or': ['datum.sch', select_field]}
         ).add_selection(
             select_field
         )
 
         # Plot time against altitude for the currently field observed so it's always on top
         observing_field_alts1 = alt.Chart().mark_point(filled=True).encode(
-            x='Observation Start Time:T',
-            y='Altitude(°):Q',
+            x=alt.X('st:T', title='Local Time'),
+            y=alt.Y('alt:Q', title='Altitude(°)'),
             color=alt.Color('fS:N', sort='descending', scale=field_scale, legend=alt.Legend(title='Field Status')),
             opacity=alt.condition(select_field, alt.value(1), alt.value(0.55)),
             size=alt.condition(select_field, alt.value(200), alt.value(200))
@@ -157,8 +162,8 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
 
 
         observing_field_alts = alt.Chart(field_data).mark_square(opacity=0.25, size=30, stroke='red', strokeWidth=2).encode(
-            x='Observation Start Time:T',
-            y='Altitude(°):Q',
+            x=alt.X('st:T', title='Local Time'),
+            y=alt.Y('alt:Q', title='Altitude(°)'),
             color=alt.Color('fS', sort='descending', scale=field_scale),
             tooltip=[
                 alt.Tooltip('mS', title="Moon separation: "),
@@ -172,8 +177,8 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
         )
 
         observing_field_crosses = alt.Chart().mark_point(shape='cross', fill='yellow', size=60, fillOpacity=1, strokeWidth=0).encode(
-            x='Observation Start Time:T',
-            y='Altitude(°):Q',
+            x=alt.X('st:T', title='Local Time'),
+            y=alt.Y('alt:Q', title='Altitude(°)')
         ).transform_filter(
             'datum.fS == "Scheduled Now"'
         )
@@ -182,7 +187,7 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
         alts = alt.layer(
             # add interactive line for mouseover
             alt.Chart().mark_rule(color='#C0C0C0').encode(
-                x='Observation Start Time:T'
+                x=alt.X('st:T', title='Local Time')
             ).transform_filter(select_time),
             base,
             observing_field_alts,
@@ -222,10 +227,9 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
 
     # Mouseover label
     moon_selection = alt.selection_single(on='mouseover')
-    moon_text = alt.Chart().mark_text(stroke='white', dy=12).encode(
+    moon_text = alt.Chart().mark_text(stroke='white', dy=12, text='moon').encode(
         latitude='mAlt',
         longitude='mAz',
-        text='fid',
         opacity=alt.condition(moon_selection, alt.value(1), alt.value(0))
     ).transform_filter(
         select_time
@@ -243,7 +247,7 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
     # Plot bright stars
     # https://github.com/altair-viz/altair/issues/2258 - white is not actually white?
     stars = alt.Chart(star_data).mark_point(filled=True, color='#ffffff').encode(
-        latitude='Altitude(°)',
+        latitude='alt',
         longitude='az',
         size=alt.Size('Stellar Magnitude', sort='descending', scale=alt.Scale(type='pow', range=(2,50)))
     ).add_selection(
@@ -254,7 +258,7 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
 
     # Plot not scheduled fields
     fields_not_scheduled = alt.Chart(field_data).mark_square(opacity=0.75, size=100).encode(
-        latitude='Altitude(°)',
+        latitude='alt',
         longitude='az',
         color=alt.Color('fS', sort='descending', scale=field_scale),
         tooltip=[
@@ -266,12 +270,12 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
     ).transform_filter(
         select_time
     ).transform_filter(
-        '! datum.Scheduled'
+        '! datum.sch'
     )
 
     # Plot scheduled fields
     fields_scheduled = alt.Chart(field_data).mark_square(opacity=0.75, size=100, stroke='red', strokeWidth=2).encode(
-        latitude='Altitude(°)',
+        latitude='alt',
         longitude='az',
         color=alt.Color('fS', sort='descending', scale=field_scale),
         tooltip=[
@@ -279,7 +283,7 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
             alt.Tooltip('fid', title="Field ID"),
             alt.Tooltip('c', title="Field Completion"),
             alt.Tooltip("p", title="Field Priority")],
-        opacity=alt.condition('datum.Scheduled', alt.value(1), alt.value(0)),
+        opacity=alt.condition('datum.sch', alt.value(1), alt.value(0)),
         strokeOpacity=alt.condition(select_field, alt.value(1), alt.value(0))
     ).transform_filter(
         select_time
@@ -289,17 +293,17 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
 
     # Plot + on fields scheduled to be observed tonight
     scheduled_fields_mark = alt.Chart(field_data).mark_point(shape='cross', fill='yellow', size=50, fillOpacity=1, strokeWidth=0).encode(
-        latitude='Altitude(°)',
+        latitude='alt',
         longitude='az'
     ).transform_filter(
         select_time
     ).transform_filter(
-        'datum.Scheduled'
+        'datum.sch'
     )
 
     # Plot c
     c = alt.Chart(field_data).mark_square(stroke='orange', fillOpacity=0).encode(
-        latitude='Altitude(°)',
+        latitude='alt',
         longitude='az',
         tooltip=[
             alt.Tooltip('mS', title="Moon separation: "),
@@ -313,11 +317,11 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
     ).transform_filter(
         'datum.fS == "Available"'    # Only plot for available fields
     ).transform_filter(
-        '! datum.Scheduled')    # Don't plot of fields already scheduled
+        '! datum.sch')    # Don't plot of fields already scheduled
 
     # Plot field currently observed so it's on top/higher opacity
     field_scheduled_now = alt.Chart(field_data).mark_square(opacity=1, size=80).encode(
-        latitude='Altitude(°)',
+        latitude='alt',
         longitude='az',
         color=alt.Color('fS', sort='descending', scale=field_scale),
         tooltip=[
@@ -333,7 +337,7 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
 
     # Add red border to selected fields
     selected_field = alt.Chart(field_data).mark_square(opacity=1, size=90, filled=False, color='red').encode(
-        latitude='Altitude(°)',
+        latitude='alt',
         longitude='az'
     ).transform_filter(
         select_time
@@ -360,7 +364,7 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
 
         # add text to display datetime
     time = alt.Chart(field_data).mark_text(align='left', dx=0, dy=0, baseline='bottom', fontSize=25, color="#C0C0C0", fontWeight=300).encode(
-        text=alt.Text('Observation Start Time:T', format="%Y-%m-%dT%H:%M:%S")
+        text=alt.Text('st:T', format="%Y-%m-%dT%H:%M:%S")
     ).transform_filter(select_time)
 
     # add text to display field Scheduled Now
