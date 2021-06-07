@@ -371,14 +371,14 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
         latitude='alt',
         longitude='az',
         tooltip=tooltips,
-        strokeWidth=alt.Size('c'),    # thickness of stroke indicates c
+        strokeWidth=alt.Size('c'),  # thickness of stroke indicates c
         opacity=alt.condition(select_c & select_p , alt.value(1), alt.value(0))
     ).transform_filter(
         select_time
     ).transform_filter(
-        'datum.fS == "Available"'    # Only plot for available fields
+        'datum.fS == "Available"'  # Only plot for available fields
     ).transform_filter(
-        '! datum.sch')    # Don't plot of fields already scheduled
+        '! datum.sch')  # Don't plot of fields already scheduled
 
     # Plot field currently observed so it's on top/higher opacity
     field_scheduled_now = alt.Chart(
@@ -500,7 +500,6 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
     ).project(
         type='azimuthalEquidistant', clipAngle=90, rotate=[0,-90, 180]
     )
-
 
     # LAYOUT HERE skymap and altitude plot
     # return sky_map & alts
