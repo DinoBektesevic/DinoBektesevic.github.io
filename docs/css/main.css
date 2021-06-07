@@ -5,7 +5,8 @@
 .plotContainer {
     background-color: #0e2836;
     width: min-content;
-    padding: 50px;
+    padding-left: 50px;
+    padding-right: 50px;
 }
 
 
@@ -22,7 +23,8 @@
 */
 
 h2 {
-    color: wheat /*#C0C0C0;*/
+    color: wheat; /*#C0C0C0;*/
+    padding-bottom: 15px;
 }
 .xTicks{
     color: #C0C0C0;
