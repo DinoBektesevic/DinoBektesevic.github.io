@@ -24,7 +24,9 @@ def get_data(data, moon_data=True):
     scheduled.sort_values('mjdExpStart', inplace=True)
 
     fields = data.query('objType == "sdss field"')
-    fields['Observation Start Time'] = pd.to_datetime(fields['mjdExpStart'] + 2400000.5, unit='D', origin='julian') - pd.Timedelta(hours=6)
+    timestamps = pd.to_datetime(fields['mjdExpStart'] + 2400000.5, unit='D', origin='julian') - pd.Timedelta(hours=6)
+    datetimes = [dt.to_pydatetime().strftime("%Y-%m-%dT%H:%M:%S") for dt in timestamps]
+    fields['Observation Start Time'] = datetimes
     fields = fields.loc[fields['alt'] > -.5] # could change to use 'Risen'
 
     stars = data.query('objType == "bright star"')
