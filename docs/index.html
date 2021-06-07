@@ -30,7 +30,7 @@
             <div class="plotContainer container">
                 <div class="row">
 	                  <div class="row content-justify-center">
-	                      <div class="col text-center" style="border-bottom: wheat; border-right: wheat;border-style: solid;">
+	                      <div class="col-lg-5 text-center" style="border:#0e2836;border-right:wheat;border-bottom: wheat;border-style: solid;" >
 	                          <h2>SDSS Yearly Calendar</h2>
 	                          <label for="datePlotEncoding" style="color: #C0C0C0">Colored by:</label>
 	                          <select id="datePlotEncoding">
@@ -42,7 +42,7 @@
 	                          </select>
 	                          <svg id="timePlot", width="700", height="280"></svg>
 	                      </div>
-	                      <div class="col content-justify-center text-center">
+	                      <div class="col content-justify-center text-center" style="padding-right:150px;border:#0e2836;border-style: solid;">
 	                          <h2 style="padding-bottom: 40px;">SDSS Nightly Schedule</h2>
 	                          <video id="video" width="360" height="240" controls>
 		                            <source id="videoSource" src="data/cloud_cam_video_v3.mp4" type="video/mp4">
@@ -156,7 +156,7 @@
 
              function yearlyPlot(elementid="#timePlot", col="nFields"){
                  var svg = d3.select(elementid);
-                 margin = ({top: 0, right:0, bottom: 0, left: 90});
+                 margin = ({top: 0, right:0, bottom: 0, left: 80});
                  width = svg.attr("width") - margin.top - margin.bottom;
                  height = svg.attr("height") - margin.left - margin.right;
 
@@ -204,7 +204,7 @@
                         .append("text")
                         .attr("style", `fill:#C0C0C0; font-weight: 700; font-size: 12px`)
                         .attr("text-anchor", "middle")
-                        .attr("transform",`translate(-75,${(height-margin.bottom-margin.top)/2 + margin.top}),rotate(-90)`)
+                        .attr("transform",`translate(-50,${(height-margin.bottom-margin.top)/2 + margin.top}),rotate(-90)`)
                         .text("Month");
 
                      svg.append("g")
