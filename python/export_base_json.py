@@ -9,7 +9,7 @@ def guessDatasetContent(datasetEntry):
     """
     if "fS" in datasetEntry.keys():
         return "dataFields"
-    elif "Stellar Magnitude" in datasetEntry.keys():
+    elif "mag" in datasetEntry.keys():
         return "dataStars"
     elif "mAlt" in datasetEntry.keys():
         return "dataMoon"
@@ -29,7 +29,7 @@ def create_base_json(altairJson, baseJson, pretty_print=False, indent=4):
 
     Vega's default behaviour is to name and refer to individual datasts with
     a sha or a random set of strings. This will be replaced appropriately with
-    above keys. 
+    above keys.
     """
     with open(altairJson, "r") as f:
         data = json.load(f)
