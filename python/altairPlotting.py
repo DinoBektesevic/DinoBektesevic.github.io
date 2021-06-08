@@ -42,7 +42,7 @@ def get_data(data, moon_data=True):
     # Round mangitudes to nearest 0.5
     stars = stars.query('magnitude < 4.5')
     stars['mag'] = round(stars['magnitude'], 0)
-    
+
     ####################
     # Create different field statuses
     ####################
@@ -78,7 +78,7 @@ def get_data(data, moon_data=True):
         moon = fields[['mjdExpStart', 'moonAz', 'moonAlt', 'moonPhase']].drop_duplicates()
         moon = moon.loc[moon['moonAlt'] > -.5]
         moon['time_step_id'] = [ts[mjd] for mjd in moon['mjdExpStart']]
-        
+
         # Get moon phase emoji
         avg_moon_phase = np.nanmean(moon['moonPhase'])
         phase_dict = {'🌑': [0,.1],
@@ -101,7 +101,7 @@ def get_data(data, moon_data=True):
     return fields, stars
 
 ####################
-#    Plot priorities as histogram with selection 
+#    Plot priorities as histogram with selection
 ####################
 def make_p_interact(field_data, p_selection, height=50, width=300):
     '''histogram of priorities that is brush-linked the plots'''
@@ -116,7 +116,7 @@ def make_p_interact(field_data, p_selection, height=50, width=300):
     return pri
 
 ####################
-#    Plot examples of different completions with selection 
+#    Plot examples of different completions with selection
 ####################
 def make_c_interact(field_data, c_selection, height=50, width=300):
     '''legend that is also brush-linked to the plots'''
@@ -173,7 +173,7 @@ def make_alts_plot(field_data, select_field, select_time, select_c, select_p, fi
     ).add_selection(
         select_field
     )
-    
+
     ####################
     #     Plot time against altitude for the currently field observed so it's always on top
     ####################
@@ -188,7 +188,7 @@ def make_alts_plot(field_data, select_field, select_time, select_c, select_p, fi
     ).add_selection(
         select_field
     )
-    
+
     ####################
     #    Plot fields including those not scheduled for observation
     ####################
@@ -290,7 +290,7 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
     alt_df = pd.DataFrame({"lat": [2, 30, 60, 90, 60, 30, 2],
                            "long": [0, 0, 0, 0, 180, 180, 180],
                            "text": ["0°", "30°", "60°", "90°", "60°", "30°", "0°"]})
-    
+
     ####################
     #    Plot altitude labels
     ####################
@@ -365,7 +365,7 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
         alt.Tooltip('c', title="Field Completion"),
         alt.Tooltip("p", title="Field Priority")
     ]
-    
+
     ####################
     #     Plot fields not scheduled on sky map
     ####################
@@ -451,7 +451,7 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
         '! datum.sch')  # Don't plot of fields already scheduled
 
     ####################
-    #    Plot field currently observed so it's on top/higher opacity on the sky map 
+    #    Plot field currently observed so it's on top/higher opacity on the sky map
     ####################
     field_scheduled_now = alt.Chart(
         field_data
