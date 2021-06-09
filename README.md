@@ -50,38 +50,6 @@ This project extends our [A3 prototype](https://cse512-21s.github.io/A3-astroviz
 * **Scheduled**:  Boolean.  True if the SDSS autoscheduling program picked this field for observation on a given night.
 * **ScheduledTime**:  MJD.  If Scheduled: the MJD (point in night) at which the SDSS autoscheduling program desires this field to be observed.
 
-
-
-## 2. Glossary
-**<ins>Time**<br>
-&nbsp;&nbsp;&nbsp;&nbsp;**Modified Julian Day (MJD)**:  Floating point days.  A continuous timescale used by astronomers referenced to a certain epoch (May 23, 1968).<br>
-&nbsp;&nbsp;&nbsp;&nbsp;**Local Time**: year, month, day, hours, minutes, seconds.  Transformed from MJD to the local time at Apache Point Observatory in New Mexico.<br>
-<br>
-
-**<ins>Star** <br>
-&nbsp;&nbsp;&nbsp;&nbsp;**ID**: String. [Unique identifier](http://tdc-www.harvard.edu/catalogs/bsc5.html) for a star in catalog.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;**Right Ascension (RA)**: Degrees.  Field location in equatorial coordinates.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;**Declination (Dec)**: Degrees.  Field location in equatorial coordinates.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;**Apparent Magnitude**: [Apparent brightness](https://en.wikipedia.org/wiki/Apparent_magnitude) of the star.<br>
-
-**<ins>Moon** <br>
-&nbsp;&nbsp;&nbsp;&nbsp;**Altitude (Alt)**: Degrees.  Angle of field above horizon.  Transformed from RA/Dec given a time and the latitude/longitude of Apache Point Observatory.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;**Azimuth (Az)**: Degrees.  Cardinal/compass direction to field. Transformed from RA/Dec given a time and the latitude/longitude of Apache Point Observatory<br>
-&nbsp;&nbsp;&nbsp;&nbsp;**Phase**: Float on [0,1].  The fraction of the moon that is illuminated at a certain time.  0 is a new moon, 1 is a full moon.
-
-**<ins>Field** <br>
-&nbsp;&nbsp;&nbsp;&nbsp;**ID**: Integer. Unique identifier for a field.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;**Right Ascension (RA)**: Degrees.  Field location in equatorial coordinates.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;**Declination (Dec)**: Degrees.  Field location in equatorial coordinates.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;**Altitude (Alt)**: Degrees.  Angle of field above horizon.  Transformed from RA/Dec given a time and the latitude/longitude of Apache Point Observatory.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;**Azimuth (Az)**: Degrees.  Cardinal/compass direction to field. Transformed from RA/Dec given a time and the latitude/longitude of Apache Point Observatory<br>
-&nbsp;&nbsp;&nbsp;&nbsp;**Moon Separation**: Degrees.  Solid angle on the sky between field and moon at a specific time.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;**Completion**: Float on [0,1].  Amount of signal previously acquired on this field.  Many fields require re-visitation on subsequent days for completion.  This value is a proxy for how much time has been spent on this field already, and how much time is required to complete it.  Effectively it is progress bar.  For this work we've assigned this value randomly.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;**Priority**: Integer in [0,5].  0 is highest priority, 5 is lowest.  Certain fields may be prioritized above others for observing.  For example fields that are only visible for short periods of time in the year may be assigned a higher priority due to their small observation windows to ensure they are visited.  For this work we've assigned this value randomly.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;**Scheduled**:  Boolean.  True if the SDSS autoscheduling program picked this field for observation on a given night.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;**ScheduledTime**:  MJD.  If Scheduled: the MJD (point in night) at which the SDSS autoscheduling program desires this field to be observed.
-<br>
-
 ## 3. Visualization
 
 ### 3.1 Sky Plot
@@ -190,7 +158,6 @@ In a finalized version of this tool, if it were to be used by astronomers, we wo
 </details>
 <br>
 
-
 ## 4. Data
 
 ### 4.1 Data Collection and Computation
@@ -233,7 +200,6 @@ The expected JSON format is, essentially, a list of objects that have the expect
 This, however, created a different problem. Because Altair uses this, inefficient, `record` oriented data structure to represent plot data the produced JSONs were rather large. The main drivers of the data volume in the JSONs were the repeated attribute name entries. For example, `"Time Stamp ID"` attribute is worth 13 bytes but represents an ID, which is a single byte and this is repeated every element in the list. To address this issue we performed name mangling of the data attributes in order to shorten them, as well as putting the data itself through a pretty strict diet regimen. For example, by rounding to only the significant digits, encoding attribute names in Altair, or by using 1 character flag values etc. This makes the plotting code less user-friendly which is unfortunate, but not the data creation scripts since the mangling occurs just before plotting. This procedure reduced the cumulative data volume of the JSON files from 3GB to 1.6GB. In terms of individual files this represents a reduction from 15-17MB to 4-6MB and subsequently a decrease in loading time of the visualization of 30-50%, depending on the initial size of the data files (the larger they were, the larger the savings were).
 
 We also attempted to fetch data from the APO server, while hosting on GitHub pages, but CORS policies did not allow us to easily and reliably perform this set up, so we opted to host everything on APO server.
-
 
 ## 5. Future Features
 
