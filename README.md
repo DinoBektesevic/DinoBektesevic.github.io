@@ -8,9 +8,9 @@ Team members:
 * Jessica Birky  
 * David Wang
 
-Project page: https://www.apo.nmsu.edu/CS/cse512/ 
+**Project Visualization**: https://www.apo.nmsu.edu/CS/cse512/
 
-Project video: https://www.youtube.com/watch?v=4mhJHX6-ywI&t=1s
+**Project video**: https://www.youtube.com/watch?v=4mhJHX6-ywI&t=1s
 
 
 # SDSS-V:  visualizing a telescopes' nightly plan
@@ -20,26 +20,70 @@ The Sloan Digital Sky Survey (SDSS), is a robotic telescope that scans the sky e
 
 The "optimal" plan for each night is determined algorithmically for each day.  When night operations are running smoothly, there is little reason to deviate from the plan.  However, operations do not always run smoothly: weather or technical problems can interrupt observations, and often the telescope operators need to mitigate the situation and change the plan on the fly.  We hope this tool provides a way for operators to quickly come up with alternate observing plans as conditions change throughout the night.  A good visualization will aid quick accurate decision making, especially when the potential space of field options is large.  The important factors for observing a field are "altitude" (how high in the sky the field is: higher altitude leads to better data due to less atmospheric distortion), and how far from the moon the field is (data quality suffers as fields near the moon due to its brightness!), field completion percentage (most fields require multiple re-visitations on different nights), and field priority (certain fields are deemed higher priority than other fields).
 
-This project greatly expands on our A3 prototype (https://cse512-21s.github.io/A3-astroviz/) by including 365 nights worth of data, additional interactive filters, and animated sky footage of weather conditions at the observing site.
+This project extends our A3 prototype (https://cse512-21s.github.io/A3-astroviz/) by including an interface for 365 nights worth of data, additional interactive filters, and animated sky footage of weather conditions at the observing site.  We revisited, rethought, and reorganized basic encodings, color scales, layouts and overall organization.  The final product, we feel, is much improved and more effective than our earlier prototype.
 
 ## 2. Data
 
-### 2.1 Quantities Visualized
+### 2.1 Description
+**<ins>Time**<br>
+&nbsp;&nbsp;&nbsp;&nbsp;**Modified Julian Day (MJD)**:  Floating point days.  A continuous timescale used by astronomers referenced to a certain epoch (May 23, 1968).<br>
+&nbsp;&nbsp;&nbsp;&nbsp;**Local Time**: year, month, day, hours, minutes, seconds.  Transformed from MJD to the local time at Apache Point Observatory in New Mexico.<br>
+<br>
 
-**Field**
-&nbsp;&nbsp;&nbsp;**ID (fid)**: Integer. Identifier for a field
-&nbsp;&nbsp;&nbsp;**Right Ascension (RA)**: Degrees.  Field location in equatorial coordinates.
-&nbsp;&nbsp;&nbsp;**Declination (Dec)**: Degrees.  Field location in equatorial coordinates.
+**<ins>Star** <br>
+&nbsp;&nbsp;&nbsp;&nbsp;**ID**: String. Unique identifier for a star in catalog (http://tdc-www.harvard.edu/catalogs/bsc5.html).<br>
+&nbsp;&nbsp;&nbsp;&nbsp;**Right Ascension (RA)**: Degrees.  Field location in equatorial coordinates.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;**Declination (Dec)**: Degrees.  Field location in equatorial coordinates.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;**Apparent Magnitude**: Apparent brightness of the star (https://en.wikipedia.org/wiki/Apparent_magnitude).<br>
 
-### 2.2 Data Collection
+**<ins>Moon** <br>
+&nbsp;&nbsp;&nbsp;&nbsp;**Altitude (Alt)**: Degrees.  Angle of field above horizon.  Transformed from RA/Dec given a time and the latitude/longitude of Apache Point Observatory.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;**Azimuth (Az)**: Degrees.  Cardinal/compass direction to field. Transformed from RA/Dec given a time and the latitude/longitude of Apache Point Observatory<br>
+&nbsp;&nbsp;&nbsp;&nbsp;**Phase**: Float on [0,1].  The fraction of the moon that is illuminated at a certain time.  0 is a new moon, 1 is a full moon.
 
-### 2.3 Computed Quantities
+**<ins>Field** <br>
+&nbsp;&nbsp;&nbsp;&nbsp;**ID**: Integer. Unique identifier for a field.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;**Right Ascension (RA)**: Degrees.  Field location in equatorial coordinates.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;**Declination (Dec)**: Degrees.  Field location in equatorial coordinates.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;**Altitude (Alt)**: Degrees.  Angle of field above horizon.  Transformed from RA/Dec given a time and the latitude/longitude of Apache Point Observatory.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;**Azimuth (Az)**: Degrees.  Cardinal/compass direction to field. Transformed from RA/Dec given a time and the latitude/longitude of Apache Point Observatory<br>
+&nbsp;&nbsp;&nbsp;&nbsp;**Moon Separation**: Degrees.  Solid angle on the sky between field and moon at a specific time.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;**Completion**: Float on [0,1].  Amount of signal previously acquired on this field.  Many fields require re-visitation on subsequent days for completion.  This value is a proxy for how much time has been spent on this field already, and how much time is required to complete it.  Effectively it is progress bar.  For this work we've assigned this value randomly.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;**Priority**: Integer in [0,5].  0 is highest priority, 5 is lowest.  Certain fields may be prioritized above others for observing.  For example fields that are only visible for short periods of time in the year may be assigned a higher priority due to their small observation windows to ensure they are visited.  For this work we've assigned this value randomly.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;**Scheduled**:  Boolean.  True if the SDSS autoscheduling program picked this field for observation on a given night.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;**ScheduledTime**:  MJD.  If Scheduled: the MJD (point in night) at which the SDSS autoscheduling program desires this field to be observed.
+<br>
 
-### 2.4 Data Organization
+### 2.2 Data Collection and Computation
 
-## 3. Features
+**Field** data was obtained from SDSS's roboscheduler product (https://github.com/sdss/roboscheduler).  The roboscheduler was asked to provide scheduled fields for a year beginning April 1 2020.  Each night was discretized into 18 minute time slots, which is the typical telescope exposure time.  For each timeslot on each night, the roboscheduler picks a scheduled field and additionally provides many (up to thousands) of alternate fields.  Astropy routines (https://www.astropy.org/) were used to calculate the Alt/Az coordinates of the field for each timeslot at Apache Point Observatory.
 
-### 3.1 Sky Plot
+**Star** data was drawn from the Yale Bright Star Catalog (http://tdc-www.harvard.edu/catalogs/bsc5.html).  We kept only stars brighter than an apparent magnitude of 4.5.  These are all stars visible to the human eye on a dark night.  Astropy routines were used to calculate the Alt/Az coordinates of stars for each timeslot at Apache Point Observatory.
+
+**Moon** data was obtained from Astropy's built in solar system ephemerides.  Moon phase was computed using astroplan (https://astroplan.readthedocs.io/en/latest/_modules/astroplan/moon.html).  At each timeslot the solid angle between the moon and each field was computed.
+
+**Cloud Camera**
+The cloud camera visualization was made from raw images stored in SDSS archives.  The cloud camera is a fisheye, infrared all-sky camera that is mounted next to the telescopes at Apache Point Observatory.  We intentionally picked a cloudy night to display as an example.  Observers on site have a real-time feed from this camera during the night.
+
+### 2.3 Data Organization
+
+All data was initially formatted in a tidy csv.  Our initial efforts showed incredibly poor performance when attempting web-based visualization due to the very large file sizes.  We took steps to reorganize our data into smaller JSONS which eliminated many repeated quantities in our tidy table.  We chose a directory structure based on MJD, where each MJD holds a separate JSON for fields, stars, and the moon.
+
+<img src="docs/dirStruct.png" width=650px>
+
+## 3. Visualization
+
+### 3.1 Machinery
+
+Dino or David describe the tools used in the viz, especially how you hacked altair to dynamically update based on MJD selection?
+
+We wanted a clean JSON interface so that it can be moved easily cut and pasted into another web framework.
+
+We deployed it on the APO webserver because of the large data volumes were a problem in git, and the dynamic loading of files was forbidden by javascript.
+
+
+
+### 3.2 Sky Plot
 
 <img src="docs/gifs/sky_plot_demo.gif" width=650px>
 
@@ -64,7 +108,7 @@ The sky plot updates to reflect the time selected in the time vs altitude plot -
 </details>
 <br>
 
-### 3.2 Altitude vs Time Plot
+### 3.3 Altitude vs Time Plot
 
 <img src="docs/gifs/altitude_time_demo.gif" width=650px>
 
@@ -81,7 +125,7 @@ The colors match the field statuses in the sky plot: yellow for currently observ
 </details>
 <br>
 
-### 3.3 Field Completion and Priority
+### 3.4 Field Completion and Priority
 
 <img src="docs/gifs/completion_priority_demo.gif" width=650px>
 
@@ -91,7 +135,7 @@ The colors match the field statuses in the sky plot: yellow for currently observ
 
 
 
-### 3.4 Calendar
+### 3.5 Calendar
 
 <img src="docs/gifs/calendar_date_demo.gif" width=650px>
 
@@ -125,7 +169,7 @@ The choice of a yellow-blue map for the color encoding was intended to match the
 </details>
 <br>
 
-### 3.5 Cloud Cam Demo
+### 3.6 Cloud Cam Demo
 
 <img src="docs/gifs/cloud_cam_demo.gif" width=400px>
 
@@ -150,7 +194,6 @@ In a finalized version of this tool, if it were to be used by astronomers, we wo
 
 ## 4 Future Features
 
-### 4.1 Cloud Cam Overlay
+With more time, we would have experimented with providing a toggle-able cloud cam underlay for the main sky plot.  This would allow observers to see exactly where fields land with respect to the current observing conditions, and form an intuition on which patches of sky are clearing up next for planning the next field in the sequence.  Additionally we would have liked to experiment with a "collapsible view".  This visualization shows a lot of data, and it's usually only necessary when changing plans on the fly.  When everything's going "according to plan", there is little need for much of this display.  Providing a concise and small representation of the night's observations may be preferred for these situations.
 
-### 4.2 Collapsable Schedule
 
