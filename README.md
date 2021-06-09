@@ -23,6 +23,36 @@ The "optimal" plan for each night is determined algorithmically for each day.  W
 This project extends our [A3 prototype](https://cse512-21s.github.io/A3-astroviz/) by including an interface for 365 nights worth of data, additional interactive filters, and animated sky footage of weather conditions at the observing site.  We revisited, rethought, and reorganized basic encodings, color scales, layouts and overall organization.  The final product, we feel, is much improved and more effective than our earlier prototype.
 
 ## 2. Glossary
+**Time**
+    * **Modified Julian Day (MJD)**:  Floating point days.  A continuous timescale used by astronomers referenced to a certain epoch (May 23, 1968).
+    * **Local Time**: year, month, day, hours, minutes, seconds.  Transformed from MJD to the local time at Apache Point Observatory in New Mexico.
+
+**Star** 
+    * **ID**: String. [Unique identifier](http://tdc-www.harvard.edu/catalogs/bsc5.html) for a star in catalog.
+    * **Right Ascension (RA)**: Degrees.  Field location in equatorial coordinates.
+    * **Declination (Dec)**: Degrees.  Field location in equatorial coordinates.
+    * **Apparent Magnitude**: [Apparent brightness](https://en.wikipedia.org/wiki/Apparent_magnitude) of the star.
+
+**Moon** 
+    * **Altitude (Alt)**: Degrees.  Angle of field above horizon.  Transformed from RA/Dec given a time and the latitude/longitude of Apache Point Observatory.
+    * **Azimuth (Az)**: Degrees.  Cardinal/compass direction to field. Transformed from RA/Dec given a time and the latitude/longitude of Apache Point Observatory
+    * **Phase**: Float on [0,1].  The fraction of the moon that is illuminated at a certain time.  0 is a new moon, 1 is a full moon.
+
+**Field** 
+    * **ID**: Integer. Unique identifier for a field.
+    * **Right Ascension (RA)**: Degrees.  Field location in equatorial coordinates.
+    * **Declination (Dec)**: Degrees.  Field location in equatorial coordinates.
+    * **Altitude (Alt)**: Degrees.  Angle of field above horizon.  Transformed from RA/Dec given a time and the latitude/longitude of Apache Point Observatory.
+    * **Azimuth (Az)**: Degrees.  Cardinal/compass direction to field. Transformed from RA/Dec given a time and the latitude/longitude of Apache Point Observatory
+    * **Moon Separation**: Degrees.  Solid angle on the sky between field and moon at a specific time.
+    * **Completion**: Float on [0,1].  Amount of signal previously acquired on this field.  Many fields require re-visitation on subsequent days for completion.  This value is a proxy for how much time has been spent on this field already, and how much time is required to complete it.  Effectively it is progress bar.  For this work we've assigned this value randomly.
+    * **Priority**: Integer in [0,5].  0 is highest priority, 5 is lowest.  Certain fields may be prioritized above others for observing.  For example fields that are only visible for short periods of time in the year may be assigned a higher priority due to their small observation windows to ensure they are visited.  For this work we've assigned this value randomly.
+    * **Scheduled**:  Boolean.  True if the SDSS autoscheduling program picked this field for observation on a given night.
+    * **ScheduledTime**:  MJD.  If Scheduled: the MJD (point in night) at which the SDSS autoscheduling program desires this field to be observed.
+
+
+
+## 2. Glossary
 **<ins>Time**<br>
 &nbsp;&nbsp;&nbsp;&nbsp;**Modified Julian Day (MJD)**:  Floating point days.  A continuous timescale used by astronomers referenced to a certain epoch (May 23, 1968).<br>
 &nbsp;&nbsp;&nbsp;&nbsp;**Local Time**: year, month, day, hours, minutes, seconds.  Transformed from MJD to the local time at Apache Point Observatory in New Mexico.<br>
