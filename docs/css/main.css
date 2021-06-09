@@ -1,23 +1,23 @@
-/* This is actually override for bootstrap CSS so no touchy this */
 .container {
-    max-width: 1400px;
+    max-width: 2000px;
 }
 
-/* This is actually override for bootstrap CSS so no touchy */
-
-.bar {
-    fill: green;
+.plotContainer {
+    background-color: #0e2836;
+    width: min-content;
+    padding-left: 50px;
+    padding-right: 50px;
+    padding-top: 30px;
 }
 
-.bar1{
-    fill: black;
+.plotTitle {
+    color: wheat; /*#C0C0C0;*/
+    padding-bottom: 15px;
+}
+.xTicks{
+    color: #C0C0C0;
 }
 
-.highlight {
-    fill: red;
-}
-
-.title {
-    fill: blue;
-    font-weight: bold;
+.yTicks{
+    color: #C0C0C0;
 }
