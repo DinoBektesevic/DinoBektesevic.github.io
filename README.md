@@ -29,13 +29,13 @@ This project extends our [A3 prototype](https://cse512-21s.github.io/A3-astroviz
 
 **<ins>Star** 
 * **ID**: String. [Unique identifier](http://tdc-www.harvard.edu/catalogs/bsc5.html) for a star in catalog.
-* **Right Ascension (RA)**: Degrees.  Field location in equatorial coordinates.
-* **Declination (Dec)**: Degrees.  Field location in equatorial coordinates.
+* **Right Ascension (RA)**: Degrees.  Star location in equatorial coordinates.
+* **Declination (Dec)**: Degrees.  Star location in equatorial coordinates.
 * **Apparent Magnitude**: [Apparent brightness](https://en.wikipedia.org/wiki/Apparent_magnitude) of the star.
 
 **<ins>Moon** 
-* **Altitude (Alt)**: Degrees.  Angle of field above horizon.  Transformed from RA/Dec given a time and the latitude/longitude of Apache Point Observatory.
-* **Azimuth (Az)**: Degrees.  Cardinal/compass direction to field. Transformed from RA/Dec given a time and the latitude/longitude of Apache Point Observatory
+* **Altitude (Alt)**: Degrees.  Angle of moon above horizon.  Transformed from RA/Dec given a time and the latitude/longitude of Apache Point Observatory.
+* **Azimuth (Az)**: Degrees.  Cardinal/compass direction to the moon. Transformed from RA/Dec given a time and the latitude/longitude of Apache Point Observatory
 * **Phase**: Float on [0,1].  The fraction of the moon that is illuminated at a certain time.  0 is a new moon, 1 is a full moon.
 
 **<ins>Field** 
@@ -178,6 +178,8 @@ Data was initially stored in CSV format, one file per night of observation. Our 
 We split the data in each nightly CSV file and converted them into separate JSON format files for fields, stars and the moon. The separated files were placed into directories named after the MJD to which they belong. The rationale for these steps are covered in more depth in [section 4.3](#4.3-machinery).
 
 <img src="docs/dirStruct.png" width=650px>
+
+The date selector/calendar is generated from a single json file that summarizes each available night.
 
 ### 4.3 Technical challenges.
 
