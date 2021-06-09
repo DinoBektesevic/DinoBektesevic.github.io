@@ -103,9 +103,14 @@ def get_data(data, moon_data=True):
 ####################
 #    Plot priorities as histogram with selection
 ####################
-def make_p_interact(field_data, p_selection, height=200, width=600):
+def make_p_interact(field_data, p_selection, height=150, width=600):
     '''histogram of priorities that is brush-linked the plots'''
-    pri = alt.Chart(field_data).mark_bar(size=50, color="#226082").encode(
+    pri = alt.Chart(
+        field_data
+    ).mark_bar(
+        size=50,
+        color="#226082"
+    ).encode(
         x=alt.X('p:O', title='Field Priority'),
         y=alt.Y('count()', title='# of Fields')
     ).add_selection(
@@ -141,7 +146,7 @@ def make_c_interact(field_data, c_selection, height=30, width=600):
         ).encode(
             x=alt.X('c', bin=alt.Bin(extent=[0, 100], step=10), title="Field Completion"),
             strokeWidth=alt.Size('max(c)', legend=None, bin=alt.Bin(extent=[0, 100], step=20))
-            )
+        )
     ).add_selection(
         c_selection
     ).properties(
@@ -647,7 +652,7 @@ if __name__ == "__main__":
     ).configure_axis(
         labelFontSize=20,
         titleFontSize=20,
-        labelFontWeight=500,
+        labelFontWeight=200,
     ).configure_axisLeft(
         labelColor="#C0C0C0",
         titleColor="#C0C0C0",
@@ -657,7 +662,7 @@ if __name__ == "__main__":
         labelColor="#C0C0C0",
         titleColor="#C0C0C0",
         titleFontSize=20,
-        labelFontSize=14,
+        labelFontSize=14
     ).configure_title(
         fontSize=24
     ).configure_view(
@@ -667,6 +672,9 @@ if __name__ == "__main__":
     ).configure_legend(
         labelColor="#C0C0C0",
         titleColor="#C0C0C0",
+    ).configure_concat(
+        columns=2,
+        spacing=60
     )
 
     ####################
