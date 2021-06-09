@@ -6,7 +6,7 @@
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega@5"></script>
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-lite@4.8.1"></script>
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-embed@6"></script>
-	<script src="https://d3js.org/d3.v6.min.js"></script>
+        <script src="https://d3js.org/d3.v6.min.js"></script>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
         <link rel="stylesheet" href="css/main.css">
         <title> CSE 512 A3 </title>
@@ -29,33 +29,37 @@
             -->
             <div class="plotContainer container">
                 <div class="row">
-	                  <div class="row content-justify-center">
-	                      <div class="col-lg-5 text-center">
-	                          <h1 class="plotTitle">Date Selector</h1>
-	                          <label for="datePlotEncoding" style="color: #C0C0C0">Colored by:</label>
-	                          <select id="datePlotEncoding">
+                    <div class="row content-justify-center">
+                        <div class="col-lg-5 text-center">
+                            <h1 class="plotTitle">Date Selector</h1>
+                            <label for="datePlotEncoding" style="color: #C0C0C0">Colored by:</label>
+                            <select id="datePlotEncoding">
                                 <option value="nFields">Num. of Fields</option>
                                 <option value="moonPhase">Moon Phase</option>
                                 <option value="obsHours">Hours of Observing</option>
                                 <option value="moonHours">Hours Moon is Visible</option>
                                 <option value="darkPercent">% of night Moon is not visible</option>
-	                          </select>
-	                          <svg id="timePlot", width="700", height="280"></svg>
-	                      </div>
-	                      <div class="col content-justify-center text-center" style="padding-right:150px">
-	                          <h1 class="plotTitle">Current Weather</h1>
-	                          <video id="video" height="280" controls>
-		                            <source id="videoSource" src="data/cloud_cam_video_v3.mp4" type="video/mp4">
-		                            Your browser does not support the video tag.
-	                          </video>
-	                      </div>
+                            </select>
+                            <svg id="timePlot", width="700", height="280"></svg>
+                        </div>
+                        <div class="col content-justify-center text-center" style="padding-right:150px">
+                            <h1 class="plotTitle">Current Weather</h1>
+                            <video id="video" height="280" controls>
+                                <source id="videoSource" src="data/cloud_cam_video_v3.mp4" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
                         <div class="row">
-			                      <div class="text-center content-justify-center" style="width: -moz-available;"><h1 class="plotTitle" style="padding-top: 20px;">Nightly plan</h1></div>
-	                          <div id="vis" class="d-flex justify-content-center"></div>
-	                      </div>
+                            <div class="text-center content-justify-center" style="width: -moz-available;"><h1 class="plotTitle" style="padding-top: 20px;">Nightly plan</h1></div>
+                            <div id="vis" class="d-flex justify-content-center"></div>
+                        </div>
                     </div>
                 </div>
             </div>
+            <p class="subtitle text-center font-weight-bold">If you liked what you see, check out our <br />
+                <a href="https://github.com/DinoBektesevic/DinoBektesevic.github.io/blob/main/README.md">README</a>  <br />
+                for more details!
+            </p>
             <!--
                  Include your plot scripts here!
                  It would be nice if your plots could target a specific, pre-existing
@@ -64,221 +68,221 @@
                  so that we can ensure the DOM Content is fully loaded before we start
                  drawing.
             -->
-            <script>
-             // THE FOLLOWING IS CODE REQUIRED TO REPLOT THE SKY
-             function createURI(date, filename){
-                 let baseUrl =  "data/";
-                 return baseUrl+date.toString()+"/"+filename.toString();
-             };
+                <script>
+                 // THE FOLLOWING IS CODE REQUIRED TO REPLOT THE SKY
+                 function createURI(date, filename){
+                     let baseUrl =  "data/";
+                     return baseUrl+date.toString()+"/"+filename.toString();
+                 };
 
-             async function getData(fileUri){
-                 const data = $.getJSON(fileUri);
-                 return data;
-             };
+                 async function getData(fileUri){
+                     const data = $.getJSON(fileUri);
+                     return data;
+                 };
 
-             async function getPlotData(date, filename){
-                 let fileUri = createURI(date, filename);
-                 return getData(fileUri);
-             };
+                 async function getPlotData(date, filename){
+                     let fileUri = createURI(date, filename);
+                     return getData(fileUri);
+                 };
 
-             async function replot(vegaEmbed, date) {
-                 let [stars, moon, fields, spec] = await Promise.all([getPlotData(date, "stars.json"), getPlotData(date, "moon.json"), getPlotData(date, "fields.json"), getData("data/base.json")]);
-                 spec.datasets.dataStars = stars;
-                 spec.datasets.dataMoon = moon;
-                 spec.datasets.dataFields = fields;
+                 async function replot(vegaEmbed, date) {
+                     let [stars, moon, fields, spec] = await Promise.all([getPlotData(date, "stars.json"), getPlotData(date, "moon.json"), getPlotData(date, "fields.json"), getData("data/base.json")]);
+                     spec.datasets.dataStars = stars;
+                     spec.datasets.dataMoon = moon;
+                     spec.datasets.dataFields = fields;
 
-                 var embedOpt = {"mode": "vega-lite"};
+                     var embedOpt = {"mode": "vega-lite"};
 
-                 function showError(el, error){
-                     el.innerHTML = ('<div class="error" style="color:red;">'
-                                   + '<p>JavaScript Error: ' + error.message + '</p>'
-                                   + "<p>This usually means there's a typo in your chart specification. "
-                                   + "See the javascript console for the full traceback.</p>"
-                                   + '</div>');
-                     throw error;
-                 }
+                     function showError(el, error){
+                         el.innerHTML = ('<div class="error" style="color:red;">'
+                                       + '<p>JavaScript Error: ' + error.message + '</p>'
+                                       + "<p>This usually means there's a typo in your chart specification. "
+                                       + "See the javascript console for the full traceback.</p>"
+                                       + '</div>');
+                         throw error;
+                     }
 
-                 const el = document.getElementById('vis');
-                 vegaEmbed("#vis", spec, embedOpt)
-                     .catch(error => showError(el, error));
-             };
+                     const el = document.getElementById('vis');
+                     vegaEmbed("#vis", spec, embedOpt)
+                         .catch(error => showError(el, error));
+                 };
 
 
 
-             // THE FOLLOWING IS THE CODE FOR THE DATE PLOT
-             function mouseOut(event, d, svg){
-                 svg.selectAll("#motext").remove();
-                 svg.selectAll("#mocirc").remove();
-             };
+                 // THE FOLLOWING IS THE CODE FOR THE DATE PLOT
+                 function mouseOut(event, d, svg){
+                     svg.selectAll("#motext").remove();
+                     svg.selectAll("#mocirc").remove();
+                 };
 
-             function mouseOver(event, d, svg){
-                 svg.append("g").
-	                   attr("id", "mocirc")
-                    .join("g")
-                    .append("circle")
-                    .attr("transform", `translate(${x(event.target.__data__.dayOfMonth) + x.bandwidth()/2}, ${y(event.target.__data__.monthName) + y.bandwidth()/2})`)
-                    .attr("r", d3.min([x.bandwidth()/1.5, y.bandwidth()/1.5]))
-                    .attr("fill", "#fff")
-                    .attr("opacity", 0.75)
-                    .attr("id", "mocirc")
-                    .attr("class", "mocirc")
-                    .style("pointer-events", "none");
+                 function mouseOver(event, d, svg){
+                     svg.append("g").
+                         attr("id", "mocirc")
+                        .join("g")
+                        .append("circle")
+                        .attr("transform", `translate(${x(event.target.__data__.dayOfMonth) + x.bandwidth()/2}, ${y(event.target.__data__.monthName) + y.bandwidth()/2})`)
+                        .attr("r", d3.min([x.bandwidth()/1.5, y.bandwidth()/1.5]))
+                        .attr("fill", "#fff")
+                        .attr("opacity", 0.75)
+                        .attr("id", "mocirc")
+                        .attr("class", "mocirc")
+                        .style("pointer-events", "none");
 
-                 switch (d.selectedCol) {
-                     case "nFields":
-                         displayText = d.value
-                         break;
-                     default :
-                         displayText = d.value.toFixed(1);
-                         break;
-                 }
-
-                 svg.append("g")
-	                  .attr("id", "motext")
-                    .join("g")
-                    .append("text")
-                    .text(displayText)
-                    .attr("transform", `translate(${x(event.target.__data__.dayOfMonth) + x.bandwidth()/2}, ${y(event.target.__data__.monthName) + y.bandwidth()/1.5})`)
-                    .attr("dy", "0.1em")
-                    .attr("style", `fill:black; font-size: 12px; font-family: sans-serif;`)
-                    .attr("text-anchor", "middle")
-                    .attr("alignment-baseline", "middle")
-                    .attr("id", "motext")
-                    .attr("class", "motext")
-                    .style("pointer-events", "none");
-             };
-
-             function mouseClick(event, d, svg){
-	               var previous = svg.select("#selected");
-	               previous.attr("id", "")
-	                       .attr("stroke", "none");
-
-	               var highlighted = d3.select(event.target);
-	               highlighted.attr("id", "selected")
-	                          .attr("stroke", "white")
-                            .attr("stroke-width", 2);
-
-	               // We can update the video but data volume got too large so we fake it
-                 // var video = document.getElementById('video');
-                 // video.src = createURI(d.mjd, "cloud_cam_video_v2.mp4");
-                 // video.load();
-
-	               // Plots can contains an MJD date but we opted for an in-vega solution
-	               // so we skip, but leave for posterity.
-                 // var title = d3.select("#skyPlotTitle");
-                 // title.text("SDSS Sky, star date " + d.mjd);
-
-                 replot(vegaEmbed, d.mjd);
-             };
-
-	           function updateYearlyPlot(elementid="#timePlot", col="nFields"){
-                 var svg = d3.select(elementid);
-                 d3.json("data/fieldCalendar.json").then(function(data) {
-	                   var filteredData = data.map(function(d){return {
-                         mjd: d.mjd,
-                         moonPhase: d.moonPhase,
-                         moonHours: d.moonHours,
-                         obsHours: d.obsHours,
-                         darkPercent: d.darkPercent,
-                         monthName: d.monthName,
-                         dayOfMonth: d.dayOfMonth,
-                         nFields: d.nFields,
-                         value:d[col],
-                         selectedCol: col}
-                     })
-
-                     colorScale = d3.scaleSequential(d3.interpolateCividis)
-                                    .domain(d3.extent(filteredData, d=>d.value));
-
-	                   rects = svg.selectAll("rect")
-	                              .data(filteredData);
-	                   rects.enter();
-      	             rects.attr("fill", d => colorScale(d.value))
-                          .on("mouseover", (event, d) => mouseOver(event, d, svg))
-                          .on("mouseout", (event, d) => mouseOut(event, d, svg))
-                          .on("mouseclick", (event, d) => mouseClick(event, d, svg));
-
-	                   rects.exit();
-                 });
-             };
-
-             function createYearlyPlot(elementid="#timePlot", col="nFields"){
-                 var svg = d3.select(elementid);
-                 margin = ({top: 0, right:0, bottom: 0, left: 80});
-                 width = svg.attr("width") - margin.top - margin.bottom;
-                 height = svg.attr("height") - margin.left - margin.right;
-
-                 x = d3.scaleBand()
-                       .domain([...Array(31).keys()].map(d=>d+1))
-                       .range([margin.left, width - margin.right])
-
-                 monthNames = ["2021, Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "2022, Jan", "Feb", "Mar"]
-                 y = d3.scaleBand()
-                       .domain(monthNames)
-                       .range([margin.top, height-margin.bottom])
-
-                 svg.append("g")
-                       .attr("transform", `translate(0, ${height-margin.bottom})`)
-                       .attr("class", "xTicks")
-                       .call(d3.axisBottom(x))
-                       .append("text")
-                       .attr("style", `fill:#C0C0C0; font-weight: 700; font-size: 12px`)
-                       .attr("transform",`translate(${(width-margin.right-margin.left)/2 + margin.left}, 35)`)
-                       .text("Day of month");
-
-                 svg.append("g")
-                    .attr("transform", `translate(${margin.left},0)`)
-                    .attr("class", "yTicks")
-                    .call(d3.axisLeft(y))
-                    .append("text")
-                    .attr("style", `fill:#C0C0C0; font-weight: 700; font-size: 12px`)
-                    .attr("text-anchor", "middle")
-                    .attr("transform",`translate(-50,${(height-margin.bottom-margin.top)/2 + margin.top}),rotate(-90)`)
-                    .text("Month");
-
-                 d3.json("data/fieldCalendar.json").then(function(data) {
-                     // how the heck does one append a column? Column "value" is the dropdown selector.
-                     var filteredData = data.map(function(d){return {
-                         mjd: d.mjd,
-                         moonPhase: d.moonPhase,
-                         moonHours: d.moonHours,
-                         obsHours: d.obsHours,
-                         darkPercent: d.darkPercent,
-                         monthName: d.monthName,
-                         dayOfMonth: d.dayOfMonth,
-                         nFields: d.nFields,
-                         value:d[col],
-                         selectedCol: col}
-                     })
-
-                     colorScale = d3.scaleSequential(d3.interpolateCividis)
-                                    .domain(d3.extent(filteredData, d=>d.value));
+                     switch (d.selectedCol) {
+                         case "nFields":
+                             displayText = d.value
+                             break;
+                         default :
+                             displayText = d.value.toFixed(1);
+                             break;
+                     }
 
                      svg.append("g")
-                        .classed("cells", true)
-                        .selectAll("g.cells")
-                        .data(filteredData)
+                        .attr("id", "motext")
                         .join("g")
-                        .attr("transform",d => `translate(${x(d.dayOfMonth)}, ${y(d.monthName)})`)
-                        .append("rect")
-                        .attr("width", x.bandwidth())
-                        .attr("height", y.bandwidth())
-                        .attr("fill", d => colorScale(d.value))
-                        .on("mouseover", (event, d) => mouseOver(event, d, svg))
-                        .on("mouseout", (event, d) => mouseOut(event, d, svg))
-                        .on("click", (event, d) => mouseClick(event, d, svg));
+                        .append("text")
+                        .text(displayText)
+                        .attr("transform", `translate(${x(event.target.__data__.dayOfMonth) + x.bandwidth()/2}, ${y(event.target.__data__.monthName) + y.bandwidth()/1.5})`)
+                        .attr("dy", "0.1em")
+                        .attr("style", `fill:black; font-size: 12px; font-family: sans-serif;`)
+                        .attr("text-anchor", "middle")
+                        .attr("alignment-baseline", "middle")
+                        .attr("id", "motext")
+                        .attr("class", "motext")
+                        .style("pointer-events", "none");
+                 };
+
+                 function mouseClick(event, d, svg){
+                     var previous = svg.select("#selected");
+                     previous.attr("id", "")
+                             .attr("stroke", "none");
+
+                     var highlighted = d3.select(event.target);
+                     highlighted.attr("id", "selected")
+                                .attr("stroke", "white")
+                                .attr("stroke-width", 2);
+
+                     // We can update the video but data volume got too large so we fake it
+                     // var video = document.getElementById('video');
+                     // video.src = createURI(d.mjd, "cloud_cam_video_v2.mp4");
+                     // video.load();
+
+                     // Plots can contains an MJD date but we opted for an in-vega solution
+                     // so we skip, but leave for posterity.
+                     // var title = d3.select("#skyPlotTitle");
+                     // title.text("SDSS Sky, star date " + d.mjd);
+
+                     replot(vegaEmbed, d.mjd);
+                 };
+
+                 function updateYearlyPlot(elementid="#timePlot", col="nFields"){
+                     var svg = d3.select(elementid);
+                     d3.json("data/fieldCalendar.json").then(function(data) {
+                         var filteredData = data.map(function(d){return {
+                             mjd: d.mjd,
+                             moonPhase: d.moonPhase,
+                             moonHours: d.moonHours,
+                             obsHours: d.obsHours,
+                             darkPercent: d.darkPercent,
+                             monthName: d.monthName,
+                             dayOfMonth: d.dayOfMonth,
+                             nFields: d.nFields,
+                             value:d[col],
+                             selectedCol: col}
+                         })
+
+                         colorScale = d3.scaleSequential(d3.interpolateCividis)
+                                        .domain(d3.extent(filteredData, d=>d.value));
+
+                         rects = svg.selectAll("rect")
+                                    .data(filteredData);
+                         rects.enter();
+                         rects.attr("fill", d => colorScale(d.value))
+                              .on("mouseover", (event, d) => mouseOver(event, d, svg))
+                              .on("mouseout", (event, d) => mouseOut(event, d, svg))
+                              .on("mouseclick", (event, d) => mouseClick(event, d, svg));
+
+                         rects.exit();
+                     });
+                 };
+
+                 function createYearlyPlot(elementid="#timePlot", col="nFields"){
+                     var svg = d3.select(elementid);
+                     margin = ({top: 0, right:0, bottom: 0, left: 80});
+                     width = svg.attr("width") - margin.top - margin.bottom;
+                     height = svg.attr("height") - margin.left - margin.right;
+
+                     x = d3.scaleBand()
+                           .domain([...Array(31).keys()].map(d=>d+1))
+                           .range([margin.left, width - margin.right])
+
+                     monthNames = ["2021, Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "2022, Jan", "Feb", "Mar"]
+                     y = d3.scaleBand()
+                           .domain(monthNames)
+                           .range([margin.top, height-margin.bottom])
+
+                     svg.append("g")
+                           .attr("transform", `translate(0, ${height-margin.bottom})`)
+                           .attr("class", "xTicks")
+                           .call(d3.axisBottom(x))
+                           .append("text")
+                           .attr("style", `fill:#C0C0C0; font-weight: 700; font-size: 12px`)
+                           .attr("transform",`translate(${(width-margin.right-margin.left)/2 + margin.left}, 35)`)
+                           .text("Day of month");
+
+                     svg.append("g")
+                        .attr("transform", `translate(${margin.left},0)`)
+                        .attr("class", "yTicks")
+                        .call(d3.axisLeft(y))
+                        .append("text")
+                        .attr("style", `fill:#C0C0C0; font-weight: 700; font-size: 12px`)
+                        .attr("text-anchor", "middle")
+                        .attr("transform",`translate(-50,${(height-margin.bottom-margin.top)/2 + margin.top}),rotate(-90)`)
+                        .text("Month");
+
+                     d3.json("data/fieldCalendar.json").then(function(data) {
+                         // how the heck does one append a column? Column "value" is the dropdown selector.
+                         var filteredData = data.map(function(d){return {
+                             mjd: d.mjd,
+                             moonPhase: d.moonPhase,
+                             moonHours: d.moonHours,
+                             obsHours: d.obsHours,
+                             darkPercent: d.darkPercent,
+                             monthName: d.monthName,
+                             dayOfMonth: d.dayOfMonth,
+                             nFields: d.nFields,
+                             value:d[col],
+                             selectedCol: col}
+                         })
+
+                         colorScale = d3.scaleSequential(d3.interpolateCividis)
+                                        .domain(d3.extent(filteredData, d=>d.value));
+
+                         svg.append("g")
+                            .classed("cells", true)
+                            .selectAll("g.cells")
+                            .data(filteredData)
+                            .join("g")
+                            .attr("transform",d => `translate(${x(d.dayOfMonth)}, ${y(d.monthName)})`)
+                            .append("rect")
+                            .attr("width", x.bandwidth())
+                            .attr("height", y.bandwidth())
+                            .attr("fill", d => colorScale(d.value))
+                            .on("mouseover", (event, d) => mouseOver(event, d, svg))
+                            .on("mouseout", (event, d) => mouseOut(event, d, svg))
+                            .on("click", (event, d) => mouseClick(event, d, svg));
+                     });
+                 };
+
+                 document.getElementById('datePlotEncoding').addEventListener('change', function() {
+                     updateYearlyPlot("#timePlot", this.value);
                  });
-             };
 
-             document.getElementById('datePlotEncoding').addEventListener('change', function() {
-                 updateYearlyPlot("#timePlot", this.value);
-             });
-
-             // THE FOLLOWING IS THE CODE THAT CREATES THE INITAL PLOTS
-             document.addEventListener('DOMContentLoaded', function(){
-                 replot(vegaEmbed, 59307);
-                 createYearlyPlot("#timePlot", "nFields");
-             })
-            </script>
+                 // THE FOLLOWING IS THE CODE THAT CREATES THE INITAL PLOTS
+                 document.addEventListener('DOMContentLoaded', function(){
+                     replot(vegaEmbed, 59307);
+                     createYearlyPlot("#timePlot", "nFields");
+                 })
+                </script>
     </body>
 </html>
