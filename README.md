@@ -81,21 +81,3 @@ The colors match the field statuses in the sky plot: yellow for currently observ
 > ### Video 
 >
 > Description
-
-
-## 3. Development process
-For our prototype visualization this assignment, our design choices were largely motivated by scientific utility. The idea for creating a data visualization involving SDSS data was initiated by Conor, who works on developing instrumentation for the survey, and saw the need for developing a visualization tool to help future users of this survey plan nightly observing strategies. Because Dino, David, and Jessica were not as familiar with dataset and survey, we started our development process by first discussing the dataset with Jose Sanchez-Gallego and John Donor (two research scientist working on SDSS) to get a sense of what data we have and what the most important utilities from a user perspective would be. 
-
-Deciding the scope for this project was the first major challenge for us, which took a few days of discussion. Initially we thought it would be useful to create a dynamic visualization product, which could load the data in real time, but realized this would likely take more effort to deal with a database server than it would to actually create the frontend visualization. 
-
-Once we had settled on the constraints of a static visualization, Conor put together a simulated dataset, and we met over zoom on 5/3 to discuss plot ideas and choice of visualization tool. We decided to split our efforts between D3 and Altair, with which we had more confidence in our ability to produce a rapid prototype of the final visualization. David and Jessica started working on implementing a visualization in python, and Dino and Conor started working on a d3 implementation. 
-
-A few days later on 5/6 we met again over zoom and shared our progress/initial iterations of plots. At that point David had put together the most functional version of an interactive plot using altair, and so we decided to build off of that iteration for this assignment submission, and would continue thinking about using d3 for the more ambitious final project.
- 
-Creating the altair version of the visualization took about 12 hours, split roughly as follows:
-* 3 hours to create the two plots separately, 
-* about 3 hours to link the plots to update together using a slider, 
-* an additional 3 hours to use mouseover in the altitude plot to select time and link that to the time displayed in the sky plot, plus linking field selection between the plots, 
-* 3 hours to mess with color schemes, optimize the layering, sizes, colors, and opacity.
-
-The most difficult (i.e frustrating) part was linking the time selection between the two plots. The error handling in altair often leaves little to no traceback as to what went wrong. Sometimes, certain elements just didn’t appear at all. After a few hours, I discovered that since the variables encoded by color in both plots were the same, the points wouldn’t appear in the lower plot unless the color scale was also the same. However, I found that altair is immensely powerful for putting advanced visualizations together quickly, evidenced by the fact that it only took 3 hours to create the two plots separately, and only about 12 hours to get the entire thing working.
