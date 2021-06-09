@@ -7,22 +7,10 @@
     width: min-content;
     padding-left: 50px;
     padding-right: 50px;
+    padding-top: 30px;
 }
 
-
-/*
-.h1 {
-    color: #C0C0C0;
-}
-
-.subtitle {
-    color: #C0C0C0;
-}
-
-
-*/
-
-h2 {
+.plotTitle {
     color: wheat; /*#C0C0C0;*/
     padding-bottom: 15px;
 }

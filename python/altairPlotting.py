@@ -671,7 +671,7 @@ if __name__ == "__main__":
         grid=False
     ).configure_legend(
         labelColor="#C0C0C0",
-        titleColor="#C0C0C0",
+        titleColor="#C0C0C0"
     ).configure_concat(
         columns=2,
         spacing=40
