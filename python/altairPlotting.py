@@ -674,7 +674,7 @@ if __name__ == "__main__":
         titleColor="#C0C0C0",
     ).configure_concat(
         columns=2,
-        spacing=60
+        spacing=40
     )
 
     ####################
