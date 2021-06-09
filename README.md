@@ -178,7 +178,7 @@ The cloud camera visualization was made from raw images stored in SDSS archives.
 
 Data was initially stored in CSV format, one file per night of observation. Our initial attempts were aimed at porting our A3 homework visualization to D3, but we soon found out that would involve reformatting our data into a GEOJson format to be used with [d3-geo](https://github.com/d3/d3-geo#azimuthal-projections) or implementing our own projection. While the latter was possible to do, performance, integration and usage was not pleasant so we continued using Altair.
 
-We split the data in each nightly CSV file and converted them into separate JSON format files for fields, stars and the moon. The separated files were placed into directories named after the MJD to which they belong. The rationale for these steps are covered in more depth in [section 3.1](#3.1-machinery).
+We split the data in each nightly CSV file and converted them into separate JSON format files for fields, stars and the moon. The separated files were placed into directories named after the MJD to which they belong. The rationale for these steps are covered in more depth in [section 4.3](#4.3-machinery).
 
 <img src="docs/dirStruct.png" width=650px>
 
@@ -200,9 +200,9 @@ The expected JSON format is, essentially, a list of objects that have the expect
 ]​​
 ```
 
-This, however, created a different problem. Because Altair uses this, inefficient, `record` oriented data structure to represent plot data the produced JSONs were rather large. The main drivers of the data volume in the JSONs were the repeated attribute name entries. For example, `"Time Stamp ID"` attribute is worth 13 bytes but represents an ID, which is a single byte large, and repeats itself in every element of the list. To address this issue we performed name mangling of the data attributes as well as putting the data itself through a pretty strict diet, f.e. by rounding to only the significant digits and using 1 character flag names. This makes the code a bit less user-friendly, but not the data creation scripts as the mangling occurs just before plotting, which is unfortunate. However, the procedure reduced the cumulative data volume of our JSON files from 3GB to 1.6GB. In terms of individual files this represents a reduction from 15-17MB to 4-6MB. 
+This, however, created a different problem. Because Altair uses this, inefficient, `record` oriented data structure to represent plot data the produced JSONs were rather large. The main drivers of the data volume in the JSONs were the repeated attribute name entries. For example, `"Time Stamp ID"` attribute is worth 13 bytes but represents an ID, which is a single byte and this is repeated every element in the list. To address this issue we performed name mangling of the data attributes in order to shorten them, as well as putting the data itself through a pretty strict diet regimen. For example, by rounding to only the significant digits, encoding attribute names in Altair, or by using 1 character flag values etc. This makes the plotting code less user-friendly which is unfortunate, but not the data creation scripts since the mangling occurs just before plotting. This procedure reduced the cumulative data volume of the JSON files from 3GB to 1.6GB. In terms of individual files this represents a reduction from 15-17MB to 4-6MB and subsequently a decrease in loading time of the visualization of 30-50%, depending on the initial size of the data files (the larger they were, the larger the savings were).
 
-We attempted to fetch data from the APO server, while hosting on GitHub pages, but CORS policies did not allow us to easily and reliably perform this set up, so we opted to host everything on APO server.
+We also attempted to fetch data from the APO server, while hosting on GitHub pages, but CORS policies did not allow us to easily and reliably perform this set up, so we opted to host everything on APO server.
 
 
 ## 5. Future Features
