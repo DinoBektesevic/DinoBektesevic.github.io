@@ -18,13 +18,28 @@ Project video: https://www.youtube.com/watch?v=4mhJHX6-ywI&t=1s
 ## 1. Visualization Motivation
 The Sloan Digital Sky Survey (SDSS), is a robotic telescope that scans the sky every night.  It seeks to map large areas of the sky over years-long baselines.  SDSS has broken up the sky into small patches called "fields".  Each field contains a collection of many faint targets (stars or galaxies) that are simultaneously measured in a single image. The night is discretized into 18 minute exposure chunks, one exposure per field.  The night plan is the sequence of fields the telescope visits throughout the night.  The goal of this project is to prototype a helpful visualization of an SDSS night plan to aid the observers collecting data on a nightly basis.
 
-The "optimal" plan for each night is determined algorithmically each day.  When night operations are running smoothly, there is little reason to deviate from the plan.  However, operations do not always run smoothly: weather or technical problems can interrupt observations, and often the telescope operators need to mitigate the situation and change the plan on the fly.  We hope this tool provides a way for operators to quickly come up with alternate observing plans as conditions change throughout the night.  A good visualization will aid quick accurate decision making, especially when the potential space of field options is large.  The important factors for observing a field are "altitude" (how high in the sky the field is: higher altitude leads to better data due to less atmospheric distortion), and how far from the moon the field is (data quality suffers as fields near the moon due to its brightness!), field completion (how many times a field has already been observed in the past), and field priority (scientific value of a field).
+The "optimal" plan for each night is determined algorithmically for each day.  When night operations are running smoothly, there is little reason to deviate from the plan.  However, operations do not always run smoothly: weather or technical problems can interrupt observations, and often the telescope operators need to mitigate the situation and change the plan on the fly.  We hope this tool provides a way for operators to quickly come up with alternate observing plans as conditions change throughout the night.  A good visualization will aid quick accurate decision making, especially when the potential space of field options is large.  The important factors for observing a field are "altitude" (how high in the sky the field is: higher altitude leads to better data due to less atmospheric distortion), and how far from the moon the field is (data quality suffers as fields near the moon due to its brightness!), field completion percentage (most fields require multiple re-visitations on different nights), and field priority (certain fields are deemed higher priority than other fields).
 
 This project greatly expands on our A3 prototype (https://cse512-21s.github.io/A3-astroviz/) by including 365 nights worth of data, additional interactive filters, and animated sky footage of weather conditions at the observing site.
 
-## 2. Features
+## 2. Data
 
-### 2.1 Sky Plot
+### 2.1 Quantities Visualized
+
+**Field**
+&nbsp;&nbsp;&nbsp;**ID (fid)**: Integer. Identifier for a field
+&nbsp;&nbsp;&nbsp;**Right Ascension (RA)**: Degrees.  Field location in equatorial coordinates.
+&nbsp;&nbsp;&nbsp;**Declination (Dec)**: Degrees.  Field location in equatorial coordinates.
+
+### 2.2 Data Collection
+
+### 2.3 Computed Quantities
+
+### 2.4 Data Organization
+
+## 3. Features
+
+### 3.1 Sky Plot
 
 <img src="docs/gifs/sky_plot_demo.gif" width=650px>
 
@@ -49,7 +64,7 @@ The sky plot updates to reflect the time selected in the time vs altitude plot -
 </details>
 <br>
 
-### 2.2 Altitude vs Time Plot
+### 3.2 Altitude vs Time Plot
 
 <img src="docs/gifs/altitude_time_demo.gif" width=650px>
 
@@ -66,7 +81,7 @@ The colors match the field statuses in the sky plot: yellow for currently observ
 </details>
 <br>
 
-### 2.3 Field Completion and Priority
+### 3.3 Field Completion and Priority
 
 <img src="docs/gifs/completion_priority_demo.gif" width=650px>
 
@@ -76,7 +91,7 @@ The colors match the field statuses in the sky plot: yellow for currently observ
 
 
 
-### 2.4 Calendar
+### 3.4 Calendar
 
 <img src="docs/gifs/calendar_date_demo.gif" width=650px>
 
@@ -110,7 +125,7 @@ The choice of a yellow-blue map for the color encoding was intended to match the
 </details>
 <br>
 
-### 2.5 Cloud Cam Demo
+### 3.5 Cloud Cam Demo
 
 <img src="docs/gifs/cloud_cam_demo.gif" width=400px>
 
@@ -132,3 +147,10 @@ On the horizon of the cam you can also see the domes of three other instruments 
 In a finalized version of this tool, if it were to be used by astronomers, we would replace this panel with the current live-feed image from the telescope site so that users could compare the sky plot to the weather conditions in real time. However, the live feed images are only served during night time at the observing site. So for the purposes of this data visualization assignment, we instead included an animation of a recent cloudy night, so people can get a sense of what challenging weather conditions astronomers might have to deal with. 
 </details>
 <br>
+
+## 4 Future Features
+
+### 4.1 Cloud Cam Overlay
+
+### 4.2 Collapsable Schedule
+
