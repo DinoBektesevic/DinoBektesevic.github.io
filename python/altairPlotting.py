@@ -103,7 +103,7 @@ def get_data(data, moon_data=True):
 ####################
 #    Plot priorities as histogram with selection
 ####################
-def make_p_interact(field_data, p_selection, height=150, width=600):
+def make_p_interact(field_data, p_selection, height=150, width=615):
     '''histogram of priorities that is brush-linked the plots'''
     pri = alt.Chart(
         field_data
@@ -124,7 +124,7 @@ def make_p_interact(field_data, p_selection, height=150, width=600):
 ####################
 #    Plot examples of different completions with selection
 ####################
-def make_c_interact(field_data, c_selection, height=30, width=600):
+def make_c_interact(field_data, c_selection, height=30, width=620):
     '''legend that is also brush-linked to the plots'''
     comp = alt.layer(
         # completion chart/legend
@@ -248,7 +248,7 @@ def make_alts_plot(field_data, select_field, select_time, select_c, select_p, fi
         observing_field_crosses,
         data=field_data,
     ).properties(
-        width=600,
+        width=630,
         height=300
     )
 
@@ -674,7 +674,7 @@ if __name__ == "__main__":
         titleColor="#C0C0C0"
     ).configure_concat(
         columns=2,
-        spacing=40
+        spacing=35
     )
 
     ####################
