@@ -103,22 +103,23 @@ def get_data(data, moon_data=True):
 ####################
 #    Plot priorities as histogram with selection
 ####################
-def make_p_interact(field_data, p_selection, height=50, width=300):
+def make_p_interact(field_data, p_selection, height=200, width=600):
     '''histogram of priorities that is brush-linked the plots'''
-    pri = alt.Chart(field_data).mark_bar().encode(
+    pri = alt.Chart(field_data).mark_bar(size=50, color="#226082").encode(
         x=alt.X('p:O', title='Field Priority'),
         y=alt.Y('count()', title='# of Fields')
     ).add_selection(
         p_selection
     ).properties(
         height=height,
-        width=width)
+        width=width,
+    )
     return pri
 
 ####################
 #    Plot examples of different completions with selection
 ####################
-def make_c_interact(field_data, c_selection, height=50, width=300):
+def make_c_interact(field_data, c_selection, height=30, width=600):
     '''legend that is also brush-linked to the plots'''
     comp = alt.layer(
         # completion chart/legend
@@ -243,7 +244,7 @@ def make_alts_plot(field_data, select_field, select_time, select_c, select_p, fi
         data=field_data,
     ).properties(
         width=600,
-        height=200
+        height=300
     )
 
     return alts
@@ -441,7 +442,7 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
         latitude='alt',
         longitude='az',
         tooltip=tooltips,
-        strokeWidth=alt.Size('c'),  # thickness of stroke indicates c
+        strokeWidth=alt.Size('c'),  # thickness of stroke indicates completion
         opacity=alt.condition(select_c & select_p , alt.value(1), alt.value(0))
     ).transform_filter(
         select_time
@@ -556,7 +557,7 @@ def make_viz(field_data, star_data, moon_data, select_field, select_time, field_
     ####################
     #    Create sky map visualization (right side circular plot)
     ####################
-    sky_map = ((time | field_text) & ((c_legend | p_legend) & alts)) | alt.layer(  # LAYOUT ARRANGED HERE
+    sky_map = ((time | field_text) & (c_legend & p_legend &  alts)) | alt.layer(  # LAYOUT ARRANGED HERE
         # use the sphere of the Earth as the base layer
         alt.Chart({'sphere': True}).mark_geoshape(
             color=alt.RadialGradient(
@@ -665,7 +666,8 @@ if __name__ == "__main__":
         grid=False
     ).configure_legend(
         labelColor="#C0C0C0",
-        titleColor="#C0C0C0",)
+        titleColor="#C0C0C0",
+    )
 
     ####################
     #    Save plot
