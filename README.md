@@ -67,7 +67,7 @@ This project extends our [A3 prototype](https://cse512-21s.github.io/A3-astroviz
 
 We took advantage of altair’s projection functions to map our data onto the sky. By mapping azimuth to longitude and altitude to latitude, and projecting using a north pole centered azimuthal equidistant projection, we could produce a circular map of the sky equivalent to a 180 degree fisheye view. Coincidentally, this is the view the all-sky camera at the SDSS telescope sees the sky--for the final project, we may incorporate a feed of this camera and plot fields on top of the live view. We made the background very dark and plotted lighter elements on top. We found this both approximates the sky better, appears less cluttered, and is more visually appealing.
  
-Fields planned for observation during the night are plotted as squares corresponding to the area on the sky that would be imaged by the telescope. The yellow field corresponds to the field currently being observed, and the luminous blue (the “opposite” of yellow in L*ab) corresponds to fields not currently being observed, but meeting criteria for observation. We distinguish fields not meeting criteria for observation at that time by coloring them in pale blue. As time progresses, the status of the fields will change, with the colors updating correspondingly. We use tooltips to display the ID of each field and its separation from the moon, which are the two features observers will likely want to reference.
+Fields visible during the night are plotted as squares corresponding to the area on the sky that would be imaged by the telescope. The yellow field corresponds to the field currently being observed, and the luminous blue (the “opposite” of yellow in L*ab) corresponds to fields not currently being observed, but meeting criteria for observation. We distinguish fields not meeting criteria for observation at that time by coloring them in pale blue. If a field is scheduled for observation at some point that night, we overplot a yellow + symbol on the field. As time progresses, the status of the fields will change, with the colors updating correspondingly. We use tooltips to display the ID of each field and its separation from the moon, which are the two features observers will likely want to reference.
 
 Hovering over a field brings up more information a field highlights the edge in the sky plot in red, and makes the corresponding track in the altitude plot completely opaque, making these points immediately stand out. Points selected in the altitude plot will outline the sky plot as both are linked. The field currently being observed is always in the top layer: this makes them easier to click.
 
@@ -101,6 +101,16 @@ The colors match the field statuses in the sky plot: yellow for currently observ
 > ### Completeness/Priority Selections (top left plots)
 >
 > Available fields can also be filtered by completion (encoded with orange overlays on the fields) and priority, allowing astronomers to see alternatives to the scheduled fields.
+  
+<details>
+  <summary markdown="span">Design rationale</summary>
+
+While the completion of a field can be anywhere between zero and one hundred, when a users looks for a replacement field, they usually care about the relative completions between fields. As such, we chose an encoding - overplotting hollow squares on available fields - that offers this information at a glance, even though the absolute completion may be difficult to identify. The orange color contrasts with the dark blue background (i.e. the color encoding of the available fields). The contrast between the squares and the crosses (+) are an additional encoding that delineates scheduled fields from unscheduled but available fields and this helps make this information accessible to those experiencing a color deficiency. The legend for completion also is interactive, allowing users to filter the fields plotted on the sky map to a range of completions.
+  
+Users may also care about field priority when selecting replacement fields. Use the same brushing and linking technique, we allow users to display a only a subset of priorities on the sky map as well. Since priorities are an ordinal variable, we plot the distribution as a bar chart. If selecting both completion and priority, the displayed fields always meet both selection conditions, as the number of possible fields each night greatly exceed the number scheduled to be observed.
+
+</details>
+<br>
 
 ### 3.4 Calendar
 
